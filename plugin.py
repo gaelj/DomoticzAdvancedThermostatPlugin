@@ -74,6 +74,7 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
 #     DomoticzImage as Image, \
 #     DomoticzImages as Images
 
+import Domoticz
 
 def onStart():
     Domoticz.Debugging(1) #(DL.ShowAll)
