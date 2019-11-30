@@ -18,7 +18,7 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
 """
 <plugin
     key="AdvancedThermostat"
-    name="Domoticz Advanced Thermostat"
+    name="Advanced Thermostat"
     author="gaelj"
     version="1.0.0"
     wikilink="https://github.com/gaelj/DomoticzAdvancedThermostatPlugin/blob/master/README.md"
