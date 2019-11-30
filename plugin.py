@@ -80,21 +80,22 @@ import base64
 import itertools
 from distutils.version import LooseVersion
 
-from DomoticzWrapper.DomoticzWrapper import \
-    DeviceParam, DomoticzTypeName, DomoticzPluginParameter, DomoticzDebugLevel, DomoticzWrapper #, \
+from DomoticzWrapper import \
+    DeviceParam, DomoticzTypeName, DomoticzPluginParameter, DomoticzDebugLevel, DomoticzWrapper, DomoticzDevice, DomoticzConnection, DomoticzImage #, \
     #     DomoticzDevice as D, \
     #     DomoticzWrapper as Domoticz, \
-    #     DomoticzParameters as Parameters, \
+    #     Parameters as Parameters, \
     #     DomoticzSettings as settings, \
-    #     DomoticzDevices as Devices, \
+    #     Devices as Devices, \
     #     DomoticzImage as Image, \
     #     DomoticzImages as Images
 
 d = DomoticzWrapper(Domoticz, Settings, Parameters, Images)
+c = DomoticzConnection(d,  )
 
 def onStart():
-    d.DomoticzInstance.Debugging(DomoticzDebugLevel.ShowAll)  # (DL.ShowAll)
-    d.DomoticzInstance.Status("Hello, World !")
+    d.Debugging(DomoticzDebugLevel.ShowAll)  # (DL.ShowAll)
+    d.Status("Hello, World !")
     DumpConfigToLog()
 
 
@@ -115,15 +116,15 @@ def parseCSV(strCSV):
 def DomoticzAPI(APICall):
     resultJson = None
     url = "http://{}:{}/json.htm?{}".format(
-        d.DomoticzParameters[DomoticzPluginParameter.Address], d.DomoticzParameters[DomoticzPluginParameter.Port], parse.quote(APICall, safe="&="))
-    d.DomoticzInstance.Debug("Calling domoticz API: {}".format(url))
+        d.Parameters[DomoticzPluginParameter.Address], d.Parameters[DomoticzPluginParameter.Port], parse.quote(APICall, safe="&="))
+    d.Debug("Calling domoticz API: {}".format(url))
     try:
         req = request.Request(url)
-        if d.DomoticzParameters[DomoticzPluginParameter.Username] != "":
-            d.DomoticzInstance.Debug("Add authentication for user {}".format(
-                d.DomoticzParameters["Username"]))
+        if d.Parameters[DomoticzPluginParameter.Username] != "":
+            d.Debug("Add authentication for user {}".format(
+                d.Parameters[DomoticzPluginParameter.Username]))
             credentials = ('%s:%s' %
-                           (d.DomoticzParameters[DomoticzPluginParameter.Username], d.DomoticzParameters[DomoticzPluginParameter.Password]))
+                           (d.Parameters[DomoticzPluginParameter.Username], d.Parameters[DomoticzPluginParameter.Password]))
             encoded_credentials = base64.b64encode(credentials.encode('ascii'))
             req.add_header('Authorization', 'Basic %s' %
                            encoded_credentials.decode("ascii"))
@@ -132,14 +133,14 @@ def DomoticzAPI(APICall):
         if response.status == 200:
             resultJson = json.loads(response.read().decode('utf-8'))
             if resultJson["status"] != "OK":
-                d.DomoticzInstance.Error("Domoticz API returned an error: status = {}".format(
+                d.Error("Domoticz API returned an error: status = {}".format(
                     resultJson["status"]))
                 resultJson = None
         else:
-            d.DomoticzInstance.Error(
+            d.Error(
                 "Domoticz API: http error = {}".format(response.status))
     except:
-        d.DomoticzInstance.Error("Error calling '{}'".format(url))
+        d.Error("Error calling '{}'".format(url))
     return resultJson
 
 
@@ -148,21 +149,21 @@ def CheckParam(name, value, default):
         param = int(value)
     except ValueError:
         param = default
-        d.DomoticzInstance.Error("Parameter '{}' has an invalid value of '{}' ! default of '{}' is instead used.".format(name, value, default))
+        d.Error("Parameter '{}' has an invalid value of '{}' ! default of '{}' is instead used.".format(name, value, default))
     return param
 
 
 # Generic helper functions
 def DumpConfigToLog():
-    for x in d.DomoticzParameters:
-        if d.DomoticzParameters[x] != "":
-            d.DomoticzInstance.Debug("'" + x + "':'" + str(d.DomoticzParameters[x]) + "'")
-    d.DomoticzInstance.Debug("Device count: " + str(len(d.DomoticzDevices)))
-    for x in d.DomoticzDevices:
-        d.DomoticzInstance.Debug("Device:           " + str(x) + " - " + str(d.DomoticzDevices[x]))
-        d.DomoticzInstance.Debug("Device ID:       '" + str(d.DomoticzDevices[x].ID) + "'")
-        d.DomoticzInstance.Debug("Device Name:     '" + d.DomoticzDevices[x].Name + "'")
-        d.DomoticzInstance.Debug("Device nValue:    " + str(d.DomoticzDevices[x].nValue))
-        d.DomoticzInstance.Debug("Device sValue:   '" + d.DomoticzDevices[x].sValue + "'")
-        d.DomoticzInstance.Debug("Device LastLevel: " + str(d.DomoticzDevices[x].LastLevel))
+    for x in d.Parameters:
+        if d.Parameters[x] != "":
+            d.Debug("'" + x + "':'" + str(d.Parameters[x]) + "'")
+    d.Debug("Device count: " + str(len(d.Devices)))
+    for x in d.Devices:
+        d.Debug("Device:           " + str(x) + " - " + str(d.Devices[x]))
+        d.Debug("Device ID:       '" + str(d.Devices[x].ID) + "'")
+        d.Debug("Device Name:     '" + d.Devices[x].Name + "'")
+        d.Debug("Device nValue:    " + str(d.Devices[x].nValue))
+        d.Debug("Device sValue:   '" + d.Devices[x].sValue + "'")
+        d.Debug("Device LastLevel: " + str(d.Devices[x].LastLevel))
     return
