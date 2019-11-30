@@ -80,7 +80,7 @@ import base64
 import itertools
 from distutils.version import LooseVersion
 
-from ..DomoticzWrapper.DomoticzWrapper import \
+from DomoticzWrapper.DomoticzWrapper import \
     DeviceParam, DomoticzTypeName, DomoticzPluginParameter, DomoticzDebugLevel #, \
     #     DomoticzDevice as D, \
     #     DomoticzWrapper as Domoticz, \
