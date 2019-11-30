@@ -91,7 +91,6 @@ from DomoticzWrapper import \
     #     DomoticzImages as Images
 
 d = DomoticzWrapper(Domoticz, Settings, Parameters, Images)
-c = DomoticzConnection(d,  )
 
 def onStart():
     d.Debugging(DomoticzDebugLevel.ShowAll)  # (DL.ShowAll)
