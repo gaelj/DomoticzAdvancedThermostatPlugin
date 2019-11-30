@@ -65,16 +65,16 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
 </plugin>
 """
 
-from ..DomoticzWrapper.DomoticzWrapper import \
-    DeviceParam, DomoticzDevice as D, DomoticzTypeName as TN, DomoticzPluginParameter as PP, DomoticzDebugLevel as DL#, \
-    # DomoticzWrapper as Domoticz, \
-    # DomoticzParameters as Parameters, \
-    # DomoticzSettings as settings, \
-    # DomoticzDevices as Devices, \
-    # DomoticzImage as Image, \
-    # DomoticzImages as Images
+# from ..DomoticzWrapper.DomoticzWrapper import \
+#     DeviceParam, DomoticzDevice as D, DomoticzTypeName as TN, DomoticzPluginParameter as PP, DomoticzDebugLevel as DL#, \
+#     DomoticzWrapper as Domoticz, \
+#     DomoticzParameters as Parameters, \
+#     DomoticzSettings as settings, \
+#     DomoticzDevices as Devices, \
+#     DomoticzImage as Image, \
+#     DomoticzImages as Images
 
 
 def onStart():
-    Domoticz.Debugging(DL.ShowAll)
+    Domoticz.Debugging(1) #(DL.ShowAll)
     Domoticz.Status("Hello, World !")
