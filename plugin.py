@@ -148,7 +148,7 @@ def CheckParam(name, value, default):
         param = int(value)
     except ValueError:
         param = default
-        d.DomoticzInstance.Error(f"Parameter '{name}' has an invalid value of '{value}' ! default of '{default}' is instead used.")
+        d.DomoticzInstance.Error("Parameter '{}' has an invalid value of '{}' ! default of '{}' is instead used.".format(name, value, default))
     return param
 
 
