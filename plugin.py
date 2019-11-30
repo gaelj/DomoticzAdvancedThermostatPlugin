@@ -81,7 +81,9 @@ import itertools
 from distutils.version import LooseVersion
 
 from DomoticzWrapper import \
-    DeviceParam, DomoticzTypeName, DomoticzPluginParameter, DomoticzDebugLevel, DomoticzWrapper, DomoticzDevice, DomoticzConnection, DomoticzImage #, \
+    DeviceParam, DomoticzTypeName, DomoticzPluginParameter, DomoticzDebugLevel, \
+    DomoticzWrapper, DomoticzDevice, DomoticzConnection, DomoticzImage, \
+    parseCSV
     #     DomoticzDevice as D, \
     #     DomoticzWrapper as Domoticz, \
     #     Parameters as Parameters, \
@@ -90,79 +92,12 @@ from DomoticzWrapper import \
     #     DomoticzImage as Image, \
     #     DomoticzImages as Images
 
+
 d = DomoticzWrapper(Domoticz, Settings, Parameters, Devices, Images)
 
 def onStart():
     d.Debugging([DomoticzDebugLevel.ShowAll])
     d.Status("Hello, World !")
-    DumpConfigToLog()
+    d.DumpConfigToLog()
 
 
-
-# Plugin utility functions ---------------------------------------------------
-def parseCSV(strCSV):
-    listValues = []
-    for value in strCSV.split(","):
-        try:
-            val = int(value)
-        except:
-            pass
-        else:
-            listValues.append(val)
-    return listValues
-
-
-def DomoticzAPI(APICall):
-    resultJson = None
-    url = "http://{}:{}/json.htm?{}".format(
-        d.Parameters[DomoticzPluginParameter.Address], d.Parameters[DomoticzPluginParameter.Port], parse.quote(APICall, safe="&="))
-    d.Debug("Calling domoticz API: {}".format(url))
-    try:
-        req = request.Request(url)
-        if d.Parameters[DomoticzPluginParameter.Username] != "":
-            d.Debug("Add authentication for user {}".format(
-                d.Parameters[DomoticzPluginParameter.Username]))
-            credentials = ('%s:%s' %
-                           (d.Parameters[DomoticzPluginParameter.Username], d.Parameters[DomoticzPluginParameter.Password]))
-            encoded_credentials = base64.b64encode(credentials.encode('ascii'))
-            req.add_header('Authorization', 'Basic %s' %
-                           encoded_credentials.decode("ascii"))
-
-        response = request.urlopen(req)
-        if response.status == 200:
-            resultJson = json.loads(response.read().decode('utf-8'))
-            if resultJson["status"] != "OK":
-                d.Error("Domoticz API returned an error: status = {}".format(
-                    resultJson["status"]))
-                resultJson = None
-        else:
-            d.Error(
-                "Domoticz API: http error = {}".format(response.status))
-    except:
-        d.Error("Error calling '{}'".format(url))
-    return resultJson
-
-
-def CheckParam(name, value, default):
-    try:
-        param = int(value)
-    except ValueError:
-        param = default
-        d.Error("Parameter '{}' has an invalid value of '{}' ! default of '{}' is instead used.".format(name, value, default))
-    return param
-
-
-# Generic helper functions
-def DumpConfigToLog():
-    for x in d.Parameters:
-        if d.Parameters[x] != "":
-            d.Debug("'" + x + "':'" + str(d.Parameters[x]) + "'")
-    d.Debug("Device count: " + str(len(d.Devices)))
-    for x in d.Devices:
-        d.Debug("Device:           " + str(x) + " - " + str(d.Devices[x]))
-        d.Debug("Device ID:       '" + str(d.Devices[x].ID) + "'")
-        d.Debug("Device Name:     '" + d.Devices[x].Name + "'")
-        d.Debug("Device nValue:    " + str(d.Devices[x].nValue))
-        d.Debug("Device sValue:   '" + d.Devices[x].sValue + "'")
-        d.Debug("Device LastLevel: " + str(d.Devices[x].LastLevel))
-    return
