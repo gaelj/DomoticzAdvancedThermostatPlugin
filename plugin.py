@@ -65,16 +65,6 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
 </plugin>
 """
 
-# from ..DomoticzWrapper.DomoticzWrapper import \
-#     DeviceParam, DomoticzDevice as D, DomoticzTypeName as TN, DomoticzPluginParameter as PP, DomoticzDebugLevel as DL#, \
-#     DomoticzWrapper as Domoticz, \
-#     DomoticzParameters as Parameters, \
-#     DomoticzSettings as settings, \
-#     DomoticzDevices as Devices, \
-#     DomoticzImage as Image, \
-#     DomoticzImages as Images
-
-
 # Plugin event functions ---------------------------------------------------
 
 
@@ -89,19 +79,23 @@ import time
 import base64
 import itertools
 from distutils.version import LooseVersion
+
+from ..DomoticzWrapper.DomoticzWrapper import \
+    DeviceParam, DomoticzTypeName, DomoticzPluginParameter, DomoticzDebugLevel #, \
+    #     DomoticzDevice as D, \
+    #     DomoticzWrapper as Domoticz, \
+    #     DomoticzParameters as Parameters, \
+    #     DomoticzSettings as settings, \
+    #     DomoticzDevices as Devices, \
+    #     DomoticzImage as Image, \
+    #     DomoticzImages as Images
+
+
 def onStart():
-    Domoticz.Debugging(1)  # (DL.ShowAll)
+    Domoticz.Debugging(DomoticzDebugLevel.ShowAll)  # (DL.ShowAll)
     Domoticz.Status("Hello, World !")
     DumpConfigToLog()
 
-
-class DeviceParam:
-    """The string and numeric values, and unit name of a measurement"""
-
-    def __init__(self, unit, nValue, sValue):
-        self.unit = unit
-        self.nValue = nValue
-        self.sValue = sValue
 
 
 # Plugin utility functions ---------------------------------------------------
