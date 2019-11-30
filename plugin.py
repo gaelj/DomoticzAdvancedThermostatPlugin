@@ -92,7 +92,7 @@ from DomoticzWrapper import \
 
 
 def onStart():
-    Domoticz.Debugging(int(DomoticzDebugLevel.ShowAll))  # (DL.ShowAll)
+    Domoticz.Debugging(DomoticzDebugLevel.ShowAll)  # (DL.ShowAll)
     Domoticz.Status("Hello, World !")
     DumpConfigToLog()
 
