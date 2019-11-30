@@ -90,7 +90,7 @@ from DomoticzWrapper import \
     #     DomoticzImage as Image, \
     #     DomoticzImages as Images
 
-d = DomoticzWrapper(Domoticz, Settings, Parameters, _Devices, Images)
+d = DomoticzWrapper(Domoticz, Settings, Parameters, Devices, Images)
 
 def onStart():
     d.Debugging(DomoticzDebugLevel.ShowAll)  # (DL.ShowAll)
