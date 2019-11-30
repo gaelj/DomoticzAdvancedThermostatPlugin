@@ -98,6 +98,4 @@ d = DomoticzWrapper(Domoticz, Settings, Parameters, Devices, Images)
 def onStart():
     d.Debugging([DomoticzDebugLevel.ShowAll])
     d.Status("Hello, World !")
-    d.DumpConfigToLog()
-
-
+    # d.DumpConfigToLog()
