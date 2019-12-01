@@ -80,22 +80,22 @@ import base64
 import itertools
 from distutils.version import LooseVersion
 
-from DomoticzWrapper import \
-    DeviceParam, DomoticzTypeName, DomoticzPluginParameter, DomoticzDebugLevel, \
-    DomoticzWrapper, DomoticzDevice, DomoticzConnection, DomoticzImage, \
-    parseCSV
-    #     DomoticzDevice as D, \
-    #     DomoticzWrapper as Domoticz, \
-    #     Parameters as Parameters, \
-    #     DomoticzSettings as settings, \
-    #     Devices as Devices, \
-    #     DomoticzImage as Image, \
-    #     DomoticzImages as Images
-
-
-d = DomoticzWrapper(Domoticz, Settings, Parameters, Devices, Images)
-
 def onStart():
+    from DomoticzWrapper import \
+        DeviceParam, DomoticzTypeName, DomoticzPluginParameter, DomoticzDebugLevel, \
+        DomoticzWrapper, DomoticzDevice, DomoticzConnection, DomoticzImage, \
+        parseCSV
+        #     DomoticzDevice as D, \
+        #     DomoticzWrapper as Domoticz, \
+        #     Parameters as Parameters, \
+        #     DomoticzSettings as settings, \
+        #     Devices as Devices, \
+        #     DomoticzImage as Image, \
+        #     DomoticzImages as Images
+
+
+    d = DomoticzWrapper(Domoticz, Settings, Parameters, Devices, Images)
+
     d.Debugging([DomoticzDebugLevel.ShowAll])
     d.Status("Hello, World !")
-    # d.DumpConfigToLog()
+    d.DumpConfigToLog()
