@@ -1,1 +1,0 @@
-DomoticzWrapper/DomoticzWrapper.py
