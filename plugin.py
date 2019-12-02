@@ -65,37 +65,21 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
 </plugin>
 """
 
-# Plugin event functions ---------------------------------------------------
-
-
-
-
 import Domoticz
-import json
-import urllib.parse as parse
-import urllib.request as request
 from datetime import datetime, timedelta
 import time
-import base64
-import itertools
-from distutils.version import LooseVersion
+
+from DomoticzPluginHelper import \
+    DeviceParam, DomoticzTypeName, DomoticzDebugLevel, DomoticzPluginParameters, \
+    DomoticzWrapper, DomoticzDevice, DomoticzConnection, DomoticzImage, \
+    DomoticzPluginHelper, parseCSV
+
+d = DomoticzWrapper(Domoticz, Settings, Parameters, Devices, Images)
+z = DomoticzPluginHelper(d, {})
 
 def onStart():
-    from DomoticzWrapper import \
-        DeviceParam, DomoticzTypeName, DomoticzPluginParameter, DomoticzDebugLevel, \
-        DomoticzWrapper, DomoticzDevice, DomoticzConnection, DomoticzImage, \
-        parseCSV
-        #     DomoticzDevice as D, \
-        #     DomoticzWrapper as Domoticz, \
-        #     Parameters as Parameters, \
-        #     DomoticzSettings as settings, \
-        #     Devices as Devices, \
-        #     DomoticzImage as Image, \
-        #     DomoticzImages as Images
+    z.onStart()
 
+def onStop():
+    z.onStop()
 
-    d = DomoticzWrapper(Domoticz, Settings, Parameters, Devices, Images)
-
-    d.Debugging([DomoticzDebugLevel.ShowAll])
-    d.Status("Hello, World !")
-    d.DumpConfigToLog()
