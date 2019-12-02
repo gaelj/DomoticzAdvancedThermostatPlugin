@@ -104,4 +104,5 @@ def onCommand(Unit, Command, Level, Color):
 
 def onHeartbeat():
     global z
+    global d
     z.onHeartbeat()
