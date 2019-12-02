@@ -69,17 +69,21 @@ import Domoticz
 from datetime import datetime, timedelta
 import time
 
-from DomoticzPluginHelper import \
-    DeviceParam, DomoticzTypeName, DomoticzDebugLevel, DomoticzPluginParameters, \
-    DomoticzWrapper, DomoticzDevice, DomoticzConnection, DomoticzImage, \
-    DomoticzPluginHelper, parseCSV
-
-d = DomoticzWrapper(Domoticz, Settings, Parameters, Devices, Images)
-z = DomoticzPluginHelper(d, {})
+global z
+z = None
 
 def onStart():
+    global z
+    from DomoticzPluginHelper import \
+        DeviceParam, DomoticzTypeName, DomoticzDebugLevel, DomoticzPluginParameters, \
+        DomoticzWrapper, DomoticzDevice, DomoticzConnection, DomoticzImage, \
+        DomoticzPluginHelper, parseCSV
+
+    d = DomoticzWrapper(Domoticz, Settings, Parameters, Devices, Images)
+    z = DomoticzPluginHelper(d, {})
     z.onStart()
 
 def onStop():
+    global z
     z.onStop()
 
