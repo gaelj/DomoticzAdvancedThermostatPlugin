@@ -107,7 +107,7 @@ def onStart():
     from DomoticzWrapperClass import \
         DomoticzTypeName, DomoticzDebugLevel, DomoticzPluginParameters, \
         DomoticzWrapper, DomoticzDevice, DomoticzConnection, DomoticzImage, \
-        DomoticzDeviceTypes
+        DomoticzDeviceType, DomoticzDeviceTypes
 
     from DomoticzPluginHelper import DomoticzPluginHelper, DeviceParam, ParseCSV
 
