@@ -114,22 +114,30 @@ def onStart():
     d = DomoticzWrapper(Domoticz, Settings, Parameters, Devices, Images)
     z = DomoticzPluginHelper(d, {})
     z.onStart()
-    z.InitDevice('Thermostat Control', 1, DomoticzDeviceTypes.LightSwitch_Switch_Selector, Used=True,
+    z.InitDevice('Thermostat Control', 1,
+                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
+                 Used=True,
                  Options={"LevelActions": "||||",
                           "LevelNames": "Off|Away|Night|Auto|Forced",
                           "LevelOffHidden": "false",
                           "SelectorStyle": "0"})
-    z.InitDevice('Thermostat Mode', 2, DomoticzDeviceTypes.LightSwitch_Switch_Selector, Used=True,
+    z.InitDevice('Thermostat Mode', 2,
+                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
+                 Used=True,
                  Options={"LevelActions": "||",
                           "LevelNames": "Off|Normal|Comfort",
                           "LevelOffHidden": "false",
                           "SelectorStyle": "0"})
-    z.InitDevice('Room 1 Presence', 3, DomoticzDeviceTypes.LightSwitch_Switch_Selector, Used=True,
+    z.InitDevice('Room 1 Presence', 3,
+                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
+                 Used=True,
                  Options={"LevelActions": "|",
                           "LevelNames": "Absent|Present",
                           "LevelOffHidden": "false",
                           "SelectorStyle": "0"})
-    z.InitDevice('Room 2 Presence', 4, DomoticzDeviceTypes.LightSwitch_Switch_Selector, Used=True,
+    z.InitDevice('Room 2 Presence', 4,
+                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
+                 Used=True,
                  Options={"LevelActions": "|",
                           "LevelNames": "Absent|Present",
                           "LevelOffHidden": "false",
