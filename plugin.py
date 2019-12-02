@@ -65,31 +65,43 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
 </plugin>
 """
 
+
 import Domoticz
 from datetime import datetime, timedelta
 import time
-
 global z
 global d
 z = None
 d = None
+
 
 def onStart():
     global z
     global d
 
     from DomoticzWrapperClass import \
-        DeviceParam, DomoticzTypeName, DomoticzDebugLevel, DomoticzPluginParameters, \
+        DomoticzTypeName, DomoticzDebugLevel, DomoticzPluginParameters, \
         DomoticzWrapper, DomoticzDevice, DomoticzConnection, DomoticzImage
 
-    from DomoticzPluginHelper import DomoticzPluginHelper, parseCSV
+    from DomoticzPluginHelper import DomoticzPluginHelper, DeviceParam, ParseCSV
 
     d = DomoticzWrapper(Domoticz, Settings, Parameters, Devices, Images)
     z = DomoticzPluginHelper(d, {})
     z.onStart()
+
 
 def onStop():
     global z
     global d
     z.onStop()
 
+
+def onCommand(Unit, Command, Level, Color):
+    global z
+    global d
+    z.onCommand(Unit, Command, Level, Color)
+
+
+def onHeartbeat():
+    global z
+    z.onHeartbeat()
