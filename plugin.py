@@ -35,6 +35,7 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
             <li>night</li>
             <li>eco</li>
             <li>comfort</li>
+            <li>forced</li>
         </ul>
 
         <h3>Features</h3>
@@ -48,7 +49,10 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
 
         <h3>Devices</h3>
         <ul style="list-style-type:square">
-            <li>Device Type - What it does...</li>
+            <li>Thermostat Control: Off|Away|Night|Auto|Forced</li>
+            <li>Thermostat Mode: Off|Normal|Comfort</li>
+            <li>Room 1 Presence: Absent|Present</li>
+            <li>Room 2 Presence: Absent|Present</li>
         </ul>
 
         <h3>Configuration</h3>
@@ -56,11 +60,32 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
     </description>
 
     <params>
-        <param field="Address"  label="Domoticz IP Address"                        width="200px" required="true"  default="localhost" />
-        <param field="Port"     label="Port"                                       width="40px"  required="true"  default="8080"      />
-        <param field="Username" label="Username"                                   width="200px" required="false" default=""          />
-        <param field="Password" label="Password"                                   width="200px" required="false" default=""          />
-        <param field="Mode1"    label="Inside Temperature Sensors (idx1, idx2...)" width="100px" required="true"  default="0"         />
+        <param field="Address"  label="Domoticz IP Address"                                          width="200px" required="true"  default="localhost" />
+        <param field="Port"     label="Port"                                                         width="40px"  required="true"  default="8080"      />
+        <param field="Username" label="Username"                                                     width="200px" required="false" default=""          />
+        <param field="Password" label="Password"                                                     width="200px" required="false" default=""          />
+        <param field="Mode1"    label="Inside Temperature Sensors, grouped by room (idx1, idx2...)"                   width="300px" required="true"  default=""          />
+        <param field="Mode2"    label="Outside Temperature Sensors (idx1, idx2...)"                  width="300px" required="true"  default=""          />
+        <param field="Mode3"    label="Heating switch + Inside Radiator Setpoints, grouped by room (idx1, idx2...)"   width="300px" required="true"  default=""          />
+        <param field="Mode4" label="Apply minimum heating per cycle" width="200px">
+            <options>
+				<option label="ony when heating required" value="Normal"  default="true" />
+                <option label="always" value="Forced"/>
+            </options>
+        </param>
+        <param field="Mode5" label="Calculation cycle, Minimum Heating time per cycle, Pause On delay, Pause Off delay, Forced mode duration (all in minutes)" width="200px" required="true" default="30,0,2,1,60"/>
+        <param field="Mode6" label="Logging Level" width="200px">
+            <options>
+                <option label="Normal" value="Normal" default="true"/>
+                <option label="Verbose" value="Verbose"/>
+                <option label="Debug - Python Only" value="2"/>
+                <option label="Debug - Basic" value="62"/>
+                <option label="Debug - Basic+Messages" value="126"/>
+                <option label="Debug - Connections Only" value="16"/>
+                <option label="Debug - Connections+Queue" value="144"/>
+                <option label="Debug - All" value="-1"/>
+            </options>
+        </param>
     </params>
 </plugin>
 """
@@ -81,13 +106,34 @@ def onStart():
 
     from DomoticzWrapperClass import \
         DomoticzTypeName, DomoticzDebugLevel, DomoticzPluginParameters, \
-        DomoticzWrapper, DomoticzDevice, DomoticzConnection, DomoticzImage
+        DomoticzWrapper, DomoticzDevice, DomoticzConnection, DomoticzImage, \
+        DomoticzDeviceTypes
 
     from DomoticzPluginHelper import DomoticzPluginHelper, DeviceParam, ParseCSV
 
     d = DomoticzWrapper(Domoticz, Settings, Parameters, Devices, Images)
     z = DomoticzPluginHelper(d, {})
     z.onStart()
+    z.InitDevice('Thermostat Control', 1, DomoticzDeviceTypes.LightSwitch_Switch_Selector, Used=True,
+                 Options={"LevelActions": "||||",
+                          "LevelNames": "Off|Away|Night|Auto|Forced",
+                          "LevelOffHidden": "false",
+                          "SelectorStyle": "0"})
+    z.InitDevice('Thermostat Mode', 2, DomoticzDeviceTypes.LightSwitch_Switch_Selector, Used=True,
+                 Options={"LevelActions": "||",
+                          "LevelNames": "Off|Normal|Comfort",
+                          "LevelOffHidden": "false",
+                          "SelectorStyle": "0"})
+    z.InitDevice('Room 1 Presence', 3, DomoticzDeviceTypes.LightSwitch_Switch_Selector, Used=True,
+                 Options={"LevelActions": "|",
+                          "LevelNames": "Absent|Present",
+                          "LevelOffHidden": "false",
+                          "SelectorStyle": "0"})
+    z.InitDevice('Room 2 Presence', 4, DomoticzDeviceTypes.LightSwitch_Switch_Selector, Used=True,
+                 Options={"LevelActions": "|",
+                          "LevelNames": "Absent|Present",
+                          "LevelOffHidden": "false",
+                          "SelectorStyle": "0"})
 
 
 def onStop():
