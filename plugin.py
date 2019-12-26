@@ -268,8 +268,7 @@ class PluginDevices:
 
 def onStart():
     global z
-    global z, devices
-
+    global pluginDevices
     # dev
     # from DomoticzWrapper.DomoticzWrapperClass import \
     # prod
