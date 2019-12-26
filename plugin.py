@@ -98,7 +98,7 @@ import time
 from enum import IntEnum
 global z, pluginDevices
 z = None
-devices = None
+pluginDevices = None
 
 
 # 		116	AccuWeather	    0001	1	AccuWeather THB	Temp + Humidity + Baro	THB1 - BTHR918, BTHGN129	3.8 C, 79 %, 1017 hPa	-	-
@@ -188,7 +188,7 @@ class Radiator:
         self.setPointTemperature = setPoint
 
     def Read(self):
-        pass
+        return self.measuredTemperature
 
 
 class RelayActuator:
@@ -200,14 +200,22 @@ class RelayActuator:
 
     def SetValue(self, state: bool):
         global z
-        if self.state != state:
+        if self.Read() != state:
             command = "On" if state else "Off"
             self.state = state
             z.DomoticzAPI(
                 "type=command&param=switchlight&idx={}&switchcmd={}".format(self.idx, command))
 
     def Read(self):
-        pass
+        devicesAPI = z.DomoticzAPI(
+            "type=devices&filter=light&used=true&order=Name")
+        if devicesAPI:
+            for device in devicesAPI["result"]:
+                idx = int(device["idx"])
+                if idx != self.idx: continue
+                if "Status" in device:
+                    self.state = device["Status"] == "On"
+        return self.state
 
 
 class OutsideWeather:
@@ -216,7 +224,7 @@ class OutsideWeather:
         self.temperature = None
 
     def Read(self):
-        pass
+        return self.temperature
 
 
 class PluginDevices:
@@ -281,7 +289,7 @@ def onStart():
                  Used=True,
                  Options={"LevelActions": "||",
                           "LevelNames": "Off|Normal|Comfort",
-                          "LevelOffHidden": "false",
+                          "LevelOffHidden": "true",
                           "SelectorStyle": "0"},
                  defaultNValue=0,
                  defaultSValue="10")
@@ -306,7 +314,7 @@ def onStart():
                  defaultNValue=0,
                  defaultSValue="0")
 
-    devices = PluginDevices()
+    pluginDevices = PluginDevices()
 
 
 def onStop():
@@ -315,7 +323,7 @@ def onStop():
 
 
 def onCommand(Unit, Command, Level, Color):
-    global z
+    global z, pluginDevices
     z.onCommand(Unit, Command, Level, Color)
     if Command == "On":
         value = 1
@@ -324,18 +332,20 @@ def onCommand(Unit, Command, Level, Color):
     else:
         value = Level
     du = DeviceUnits(Unit)
-    devices.switches[du].SetValue(value)
+    pluginDevices.switches[du].SetValue(value)
     z.WriteLog("DU: " + str(du))
-    if du == DeviceUnits.Room1Presence:
-        z.WriteLog("Set thermostat switch to: " + str(value > 0))
-        devices.boiler.SetValue((value > 0))
+    # if du == DeviceUnits.Room1Presence:
+    #     z.WriteLog("Set thermostat switch to: " + str(value > 0))
+    #     pluginDevices.boiler.SetValue((value > 0))
     # onHeartbeat()
 
 
 def onHeartbeat():
-    global z, devices
+    global z, pluginDevices
     z.onHeartbeat()
     now = datetime.now()
-    devices.ReadTemperatures()
-    z.WriteLog("devices.ThermostatControlSwitch.Read() => " + str(devices.ThermostatControlSwitch.Read()))
-    z.WriteLog("devices.ThermostatModeSwitch.Read() => " + str(devices.ThermostatModeSwitch.Read()))
+    pluginDevices.ReadTemperatures()
+    z.WriteLog("pluginDevices.ThermostatControlSwitch.Read() => " +
+               str(pluginDevices.ThermostatControlSwitch.Read()))
+    z.WriteLog("pluginDevices.ThermostatModeSwitch.Read() => " +
+               str(pluginDevices.ThermostatModeSwitch.Read()))
