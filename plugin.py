@@ -221,28 +221,23 @@ class PluginDevices:
             "type=devices&filter=temp&used=true&order=Name")
 
 
-pd = PluginDevices()
-pd.ReadTemperatures()
-
-
 def onStart():
     global z
 
     # dev
     # from DomoticzWrapper.DomoticzWrapperClass import \
-    #     DomoticzTypeName, DomoticzDebugLevel, DomoticzPluginParameters, \
-    #     DomoticzWrapper, DomoticzDevice, DomoticzConnection, DomoticzImage, \
-    #     DomoticzDeviceType, DomoticzDeviceTypes
-
-    # from DomoticzWrapper.DomoticzPluginHelper import DomoticzPluginHelper, DeviceParam, ParseCSV
-
     # prod
     from DomoticzWrapperClass import \
         DomoticzTypeName, DomoticzDebugLevel, DomoticzPluginParameters, \
         DomoticzWrapper, DomoticzDevice, DomoticzConnection, DomoticzImage, \
         DomoticzDeviceType, DomoticzDeviceTypes
 
-    from DomoticzPluginHelper import DomoticzPluginHelper, DeviceParam, ParseCSV
+    # dev
+    # from DomoticzWrapper.DomoticzPluginHelper import \
+    # prod
+    from DomoticzPluginHelper import \
+        DomoticzPluginHelper, DeviceParam, ParseCSV
+
 
     z = DomoticzPluginHelper(
         Domoticz, Settings, Parameters, Devices, Images, {})
