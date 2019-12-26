@@ -96,6 +96,7 @@ import Domoticz
 from datetime import datetime, timedelta
 import time
 from enum import IntEnum
+global z, pluginDevices
 z = None
 pluginDevices = None
 
