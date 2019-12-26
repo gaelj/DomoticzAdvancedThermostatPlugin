@@ -155,29 +155,23 @@ class VirtualSwitch:
     def __init__(self, pluginDeviceUnit: DeviceUnits):
         self.pluginDeviceUnit = pluginDeviceUnit
         self.value = None
-        self.nValue = None
-        self.sValue = None
 
     def SetValue(self, value):
         global z
-        if value == "On":
-            nValue = 1
-            sValue = ""
-        elif value == "Off":
-            nValue = 0
+        nValue = 1 if int(value) > 0 else 0
+        if value in (0, 1):
             sValue = ""
         else:
-            nValue = 1 if int(value) > 0 else 0
             sValue = str(value)
         z.Devices[self.pluginDeviceUnit.value].Update(
             nValue=nValue, sValue=sValue)
         self.value = value
-        self.nValue = nValue
-        self.sValue = sValue
 
     def Read(self):
         global z
-        self.sValue = z.Devices[self.pluginDeviceUnit.value].sValue
+        d = z.Devices[self.pluginDeviceUnit.value]
+        self.value = d.sValue if d.sValue != "" else d.nValue
+        return self.value
 
 
 class Radiator:
@@ -330,6 +324,7 @@ def onCommand(Unit, Command, Level, Color):
     else:
         value = Level
     devices.switches[DeviceUnits(Unit)].SetValue(value)
+    onHeartbeat()
 
 
 def onHeartbeat():
@@ -337,3 +332,4 @@ def onHeartbeat():
     z.onHeartbeat()
     now = datetime.now()
     devices.ReadTemperatures()
+    z.WriteLog("devices.ThermostatModeSwitch.Read() => " + devices.ThermostatModeSwitch.Read())
