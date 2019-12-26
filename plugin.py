@@ -280,7 +280,7 @@ class PluginDevices:
     def ReadTemperatures(self):
         global z
         global pluginDevices
-        Radiator.ReadAll()
+        Radiator.ReadAll(pluginDevices.radiators)
         self.exterior.Read()
 
 
