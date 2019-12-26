@@ -96,8 +96,9 @@ import Domoticz
 from datetime import datetime, timedelta
 import time
 from enum import IntEnum
-global z
+global z, pluginDevices
 z = None
+devices = None
 
 
 # 		116	AccuWeather	    0001	1	AccuWeather THB	Temp + Humidity + Baro	THB1 - BTHR918, BTHGN129	3.8 C, 79 %, 1017 hPa	-	-
@@ -154,12 +155,14 @@ class VirtualSwitch:
         self.value = None
 
     def SetValue(self, value):
-        d.Devices[self.pluginDeviceUnit.value].Update(
+        global z
+        z.Devices[self.pluginDeviceUnit.value].Update(
             nValue=int(value), sValue=value)
         self.value = value
 
     def Read(self):
-        self.sValue = d.Devices[self.pluginDeviceUnit.value].sValue
+        global z
+        self.sValue = z.Devices[self.pluginDeviceUnit.value].sValue
 
 
 class Radiator:
@@ -183,6 +186,7 @@ class RelayActuator:
         self.state = None
 
     def SetState(self, state: bool):
+        global z
         if self.state != state:
             command = "On" if state else "Off"
             self.state = state
@@ -219,10 +223,11 @@ class PluginDevices:
         global z
         devicesAPI = z.DomoticzAPI(
             "type=devices&filter=temp&used=true&order=Name")
+        self.exterior.Read()
 
 
 def onStart():
-    global z
+    global z, devices
 
     # dev
     # from DomoticzWrapper.DomoticzWrapperClass import \
@@ -283,6 +288,8 @@ def onStart():
                  defaultNValue=0,
                  defaultSValue="0")
 
+    devices = PluginDevices()
+
 
 def onStop():
     global z
@@ -295,6 +302,7 @@ def onCommand(Unit, Command, Level, Color):
 
 
 def onHeartbeat():
-    global z
+    global z, devices
     z.onHeartbeat()
     now = datetime.now()
+    devices.ReadTemperatures()
