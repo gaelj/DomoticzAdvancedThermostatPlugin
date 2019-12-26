@@ -249,7 +249,7 @@ def onStart():
     z.onStart()
 
     z.InitDevice('Thermostat Control', DeviceUnits.ThermostatControl,
-                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector(),
+                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
                  Used=True,
                  Options={"LevelActions": "||||",
                           "LevelNames": "Off|Away|Night|Auto|Forced",
