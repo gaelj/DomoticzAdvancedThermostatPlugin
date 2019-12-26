@@ -335,4 +335,4 @@ def onHeartbeat():
     z.onHeartbeat()
     now = datetime.now()
     devices.ReadTemperatures()
-    z.WriteLog("devices.ThermostatModeSwitch.Read() => " + devices.ThermostatModeSwitch.Read())
+    z.WriteLog("devices.ThermostatModeSwitch.Read() => " + str(devices.ThermostatModeSwitch.Read()))
