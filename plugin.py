@@ -253,10 +253,10 @@ class PluginDevices:
                 setPointIdx = setPointIdxs[i]
                 self.radiators.append(Radiator(radType, tempIdx, setPointIdx))
         self.switches = dict([(du, VirtualSwitch(du)) for du in DeviceUnits])
-        self.ThermostatControlSwitch = self.switches[DeviceUnits.ThermostatControl]
-        self.ThermostatModeSwitch = self.switches[DeviceUnits.ThermostatMode]
-        self.Room1PresenceSwitch = self.switches[DeviceUnits.Room1Presence]
-        self.Room2PresenceSwitch = self.switches[DeviceUnits.Room2Presence]
+        self.thermostatControlSwitch = self.switches[DeviceUnits.ThermostatControl]
+        self.thermostatModeSwitch = self.switches[DeviceUnits.ThermostatMode]
+        self.room1PresenceSwitch = self.switches[DeviceUnits.Room1Presence]
+        self.room2PresenceSwitch = self.switches[DeviceUnits.Room2Presence]
 
     def ReadTemperatures(self):
         global z
@@ -362,7 +362,7 @@ def onHeartbeat():
     z.onHeartbeat()
     now = datetime.now()
     pluginDevices.ReadTemperatures()
-    z.WriteLog("pluginDevices.ThermostatControlSwitch.Read() => " +
-               str(pluginDevices.ThermostatControlSwitch.Read()))
-    z.WriteLog("pluginDevices.ThermostatModeSwitch.Read() => " +
-               str(pluginDevices.ThermostatModeSwitch.Read()))
+    z.WriteLog("pluginDevices.thermostatControlSwitch.Read() => " +
+               str(pluginDevices.thermostatControlSwitch.Read()))
+    z.WriteLog("pluginDevices.thermostatModeSwitch.Read() => " +
+               str(pluginDevices.thermostatModeSwitch.Read()))
