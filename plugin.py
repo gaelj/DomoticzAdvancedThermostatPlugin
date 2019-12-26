@@ -256,7 +256,7 @@ def onStart():
     z.InitDevice('Thermostat Mode', DeviceUnits.ThermostatMode,
                  DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector(),
                  Used=True,
-                 Options={"Leve__dActions": "||",
+                 Options={"LevelActions": "||",
                           "LevelNames": "Off|Normal|Comfort",
                           "LevelOffHidden": "false",
                           "SelectorStyle": "0"},
