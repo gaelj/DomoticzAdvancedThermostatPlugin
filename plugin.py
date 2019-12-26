@@ -158,22 +158,20 @@ class VirtualSwitch:
         self.nValue = None
         self.sValue = None
 
-    def SetValue(self, Command, Level, Color):
+    def SetValue(self, value):
         global z
-        if Command == "On":
+        if value == "On":
             nValue = 1
             sValue = ""
-        elif Command == "Off":
+        elif value == "Off":
             nValue = 0
             sValue = ""
         else:
-            nValue = int(Level)
-            sValue = str(Level)
+            nValue = 1 if int(value) > 0 else 0
+            sValue = str(value)
         z.Devices[self.pluginDeviceUnit.value].Update(
             nValue=nValue, sValue=sValue)
-        self.Command = Command
-        self.Level = Level
-        self.Color = Color
+        self.value = value
         self.nValue = nValue
         self.sValue = sValue
 
@@ -325,7 +323,13 @@ def onStop():
 def onCommand(Unit, Command, Level, Color):
     global z
     z.onCommand(Unit, Command, Level, Color)
-    devices.switches[DeviceUnits(Unit)].SetValue(Command, Level, Color)
+    if Command == "On":
+        value = 1
+    elif Command == "Off":
+        value = 0
+    else:
+        value = Level
+    devices.switches[DeviceUnits(Unit)].SetValue(value)
 
 
 def onHeartbeat():
