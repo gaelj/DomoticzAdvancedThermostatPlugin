@@ -96,7 +96,6 @@ import Domoticz
 from datetime import datetime, timedelta
 import time
 from enum import IntEnum
-global z, pluginDevices
 z = None
 pluginDevices = None
 
@@ -157,7 +156,6 @@ class VirtualSwitch:
         self.value = None
 
     def SetValue(self, value):
-        global z
         nValue = 1 if int(value) > 0 else 0
         if value in (0, 1):
             sValue = ""
@@ -168,7 +166,6 @@ class VirtualSwitch:
         self.value = value
 
     def Read(self):
-        global z
         d = z.Devices[self.pluginDeviceUnit.value]
         self.value = d.sValue if d.sValue != "" else d.nValue
         return self.value
@@ -199,7 +196,6 @@ class RelayActuator:
         self.state = None
 
     def SetValue(self, state: bool):
-        global z
         if self.Read() != state:
             command = "On" if state else "Off"
             self.state = state
@@ -212,7 +208,8 @@ class RelayActuator:
         if devicesAPI:
             for device in devicesAPI["result"]:
                 idx = int(device["idx"])
-                if idx != self.idx: continue
+                if idx != self.idx:
+                    continue
                 if "Status" in device:
                     self.state = device["Status"] == "On"
         return self.state
@@ -318,12 +315,10 @@ def onStart():
 
 
 def onStop():
-    global z
     z.onStop()
 
 
 def onCommand(Unit, Command, Level, Color):
-    global z, pluginDevices
     z.onCommand(Unit, Command, Level, Color)
     if Command == "On":
         value = 1
@@ -341,7 +336,6 @@ def onCommand(Unit, Command, Level, Color):
 
 
 def onHeartbeat():
-    global z, pluginDevices
     z.onHeartbeat()
     now = datetime.now()
     pluginDevices.ReadTemperatures()
