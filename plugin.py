@@ -325,9 +325,11 @@ def onCommand(Unit, Command, Level, Color):
         value = Level
     du = DeviceUnits(Unit)
     devices.switches[du].SetValue(value)
+    z.WriteLog("DU: " + str(du))
     if du == DeviceUnits.Room1Presence:
+        z.WriteLog("Set thermostat switch to: " + str(value > 0))
         devices.ThermostatControlSwitch.SetValue((value > 0))
-    onHeartbeat()
+    # onHeartbeat()
 
 
 def onHeartbeat():
@@ -335,4 +337,5 @@ def onHeartbeat():
     z.onHeartbeat()
     now = datetime.now()
     devices.ReadTemperatures()
+    z.WriteLog("devices.ThermostatControlSwitch.Read() => " + str(devices.ThermostatControlSwitch.Read()))
     z.WriteLog("devices.ThermostatModeSwitch.Read() => " + str(devices.ThermostatModeSwitch.Read()))
