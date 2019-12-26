@@ -326,7 +326,7 @@ def onCommand(Unit, Command, Level, Color):
     du = DeviceUnits(Unit)
     devices.switches[du].SetValue(value)
     if du == DeviceUnits.Room1Presence:
-        devices.ThermostatControlSwitch.SetState((value > 0))
+        devices.ThermostatControlSwitch.SetValue((value > 0))
     onHeartbeat()
 
 
