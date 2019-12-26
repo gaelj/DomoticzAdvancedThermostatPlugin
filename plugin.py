@@ -96,7 +96,6 @@ import Domoticz
 from datetime import datetime, timedelta
 import time
 from enum import IntEnum
-global z, pluginDevices
 z = None
 pluginDevices = None
 
@@ -153,12 +152,14 @@ class VirtualSwitch:
     """Virtual switch, On/Off or multi-position"""
 
     def __init__(self, pluginDeviceUnit: DeviceUnits):
-        global z, pluginDevices
+        global z
+        global pluginDevices
         self.pluginDeviceUnit = pluginDeviceUnit
         self.value = None
 
     def SetValue(self, value):
-        global z, pluginDevices
+        global z
+        global pluginDevices
         nValue = 1 if int(value) > 0 else 0
         if value in (0, 1):
             sValue = ""
@@ -169,7 +170,8 @@ class VirtualSwitch:
         self.value = value
 
     def Read(self):
-        global z, pluginDevices
+        global z
+        global pluginDevices
         d = z.Devices[self.pluginDeviceUnit.value]
         self.value = d.sValue if d.sValue != "" else d.nValue
         return self.value
@@ -179,7 +181,8 @@ class Radiator:
     """Radiator thermostat setpoint and temperature readout"""
 
     def __init__(self, radiatorType: Rooms, idxTemp, idxSetPoint):
-        global z, pluginDevices
+        global z
+        global pluginDevices
         self.radiatorType = radiatorType
         self.idxTemp = idxTemp
         self.idxSetPoint = idxSetPoint
@@ -187,7 +190,8 @@ class Radiator:
         self.setPointTemperature = None
 
     def SetValue(self, setPoint):
-        global z, pluginDevices
+        global z
+        global pluginDevices
         self.setPointTemperature = setPoint
 
     def Read(self):
@@ -198,12 +202,14 @@ class RelayActuator:
     """On/Off relay actuator"""
 
     def __init__(self, idx):
-        global z, pluginDevices
+        global z
+        global pluginDevices
         self.idx = idx
         self.state = None
 
     def SetValue(self, state: bool):
-        global z, pluginDevices
+        global z
+        global pluginDevices
         if self.Read() != state:
             command = "On" if state else "Off"
             self.state = state
@@ -211,7 +217,8 @@ class RelayActuator:
                 "type=command&param=switchlight&idx={}&switchcmd={}".format(self.idx, command))
 
     def Read(self):
-        global z, pluginDevices
+        global z
+        global pluginDevices
         devicesAPI = z.DomoticzAPI(
             "type=devices&filter=light&used=true&order=Name")
         if devicesAPI:
@@ -252,13 +259,15 @@ class PluginDevices:
         self.Room2PresenceSwitch = self.switches[DeviceUnits.Room2Presence]
 
     def ReadTemperatures(self):
-        global z, pluginDevices
+        global z
+        global pluginDevices
         devicesAPI = z.DomoticzAPI(
             "type=devices&filter=temp&used=true&order=Name")
         self.exterior.Read()
 
 
 def onStart():
+    global z
     global z, devices
 
     # dev
@@ -281,55 +290,57 @@ def onStart():
     z.onStart()
 
     z.InitDevice('Thermostat Control', DeviceUnits.ThermostatControl,
-                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
-                 Used=True,
-                 Options={"LevelActions": "||||",
-                          "LevelNames": "Off|Away|Night|Auto|Forced",
-                          "LevelOffHidden": "false",
-                          "SelectorStyle": "0"},
-                 defaultNValue=0,
-                 defaultSValue="0")
+                    DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
+                    Used=True,
+                    Options={"LevelActions": "||||",
+                            "LevelNames": "Off|Away|Night|Auto|Forced",
+                            "LevelOffHidden": "false",
+                            "SelectorStyle": "0"},
+                    defaultNValue=0,
+                    defaultSValue="0")
 
     z.InitDevice('Thermostat Mode', DeviceUnits.ThermostatMode,
-                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
-                 Used=True,
-                 Options={"LevelActions": "||",
-                          "LevelNames": "Off|Normal|Comfort",
-                          "LevelOffHidden": "true",
-                          "SelectorStyle": "0"},
-                 defaultNValue=0,
-                 defaultSValue="10")
+                    DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
+                    Used=True,
+                    Options={"LevelActions": "||",
+                            "LevelNames": "Off|Normal|Comfort",
+                            "LevelOffHidden": "true",
+                            "SelectorStyle": "0"},
+                    defaultNValue=0,
+                    defaultSValue="10")
 
     z.InitDevice('Room 1 Presence', DeviceUnits.Room1Presence,
-                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
-                 Used=True,
-                 Options={"LevelActions": "|",
-                          "LevelNames": "Absent|Present",
-                          "LevelOffHidden": "false",
-                          "SelectorStyle": "0"},
-                 defaultNValue=0,
-                 defaultSValue="0")
+                    DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
+                    Used=True,
+                    Options={"LevelActions": "|",
+                            "LevelNames": "Absent|Present",
+                            "LevelOffHidden": "false",
+                            "SelectorStyle": "0"},
+                    defaultNValue=0,
+                    defaultSValue="0")
 
     z.InitDevice('Room 2 Presence', DeviceUnits.Room2Presence,
-                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
-                 Used=True,
-                 Options={"LevelActions": "|",
-                          "LevelNames": "Absent|Present",
-                          "LevelOffHidden": "false",
-                          "SelectorStyle": "0"},
-                 defaultNValue=0,
-                 defaultSValue="0")
+                    DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
+                    Used=True,
+                    Options={"LevelActions": "|",
+                            "LevelNames": "Absent|Present",
+                            "LevelOffHidden": "false",
+                            "SelectorStyle": "0"},
+                    defaultNValue=0,
+                    defaultSValue="0")
 
     pluginDevices = PluginDevices()
 
 
 def onStop():
-    global z, pluginDevices
+    global z
+    global pluginDevices
     z.onStop()
 
 
 def onCommand(Unit, Command, Level, Color):
-    global z, pluginDevices
+    global z
+    global pluginDevices
     z.onCommand(Unit, Command, Level, Color)
     if Command == "On":
         value = 1
@@ -347,7 +358,8 @@ def onCommand(Unit, Command, Level, Color):
 
 
 def onHeartbeat():
-    global z, pluginDevices
+    global z
+    global pluginDevices
     z.onHeartbeat()
     now = datetime.now()
     pluginDevices.ReadTemperatures()
