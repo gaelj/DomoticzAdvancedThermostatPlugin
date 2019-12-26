@@ -194,8 +194,27 @@ class Radiator:
         global pluginDevices
         self.setPointTemperature = setPoint
 
-    def Read(self):
-        return self.measuredTemperature
+    @classmethod
+    def ReadAll(cls, radiators):
+        global z
+        global pluginDevices
+        devicesAPI = z.DomoticzAPI(
+            "type=devices&filter=temp&used=true&order=Name")
+        if devicesAPI:
+            for device in devicesAPI["result"]:
+                idx = int(device["idx"])
+                if idx in [r.idxTemp for r in radiators]:
+                    radiator = [r for r in radiators if r.idxTemp == idx][0]
+                    if "Temp" in device:
+                        Domoticz.Debug(
+                            "device: {}-{} = {}".format(device["idx"], device["Name"], device["Temp"]))
+                        # check temp sensor is not timed out
+                        if not z.SensorTimedOut(idx, device["Name"], device["LastUpdate"]):
+                            radiator.measuredTemperature = device["Temp"]
+                            z.WriteLog("Radiator temp " + device["Name"] + ": " + str(device["Temp"]))
+                    else:
+                        Domoticz.Error(
+                            "device: {}-{} is not a Temperature sensor".format(device["idx"], device["Name"]))
 
 
 class RelayActuator:
@@ -261,8 +280,7 @@ class PluginDevices:
     def ReadTemperatures(self):
         global z
         global pluginDevices
-        devicesAPI = z.DomoticzAPI(
-            "type=devices&filter=temp&used=true&order=Name")
+        Radiator.ReadAll()
         self.exterior.Read()
 
 
@@ -366,3 +384,7 @@ def onHeartbeat():
                str(pluginDevices.thermostatControlSwitch.Read()))
     z.WriteLog("pluginDevices.thermostatModeSwitch.Read() => " +
                str(pluginDevices.thermostatModeSwitch.Read()))
+    z.WriteLog("pluginDevices.room1PresenceSwitch.Read() => " +
+               str(pluginDevices.room1PresenceSwitch.Read()))
+    z.WriteLog("pluginDevices.room2PresenceSwitch.Read() => " +
+               str(pluginDevices.room2PresenceSwitch.Read()))
