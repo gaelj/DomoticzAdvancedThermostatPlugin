@@ -150,15 +150,32 @@ class Rooms(IntEnum):
 
 
 class VirtualSwitch:
+    """Virtual switch, On/Off or multi-position"""
+
     def __init__(self, pluginDeviceUnit: DeviceUnits):
         self.pluginDeviceUnit = pluginDeviceUnit
         self.value = None
+        self.nValue = None
+        self.sValue = None
 
-    def SetValue(self, value):
+    def SetValue(self, Command, Level, Color):
         global z
+        if Command == "On":
+            nValue = 1
+            sValue = ""
+        elif Command == "Off":
+            nValue = 0
+            sValue = ""
+        else:
+            nValue = int(Level)
+            sValue = str(Level)
         z.Devices[self.pluginDeviceUnit.value].Update(
-            nValue=int(value), sValue=value)
-        self.value = value
+            nValue=nValue, sValue=sValue)
+        self.Command = Command
+        self.Level = Level
+        self.Color = Color
+        self.nValue = nValue
+        self.sValue = sValue
 
     def Read(self):
         global z
@@ -166,6 +183,8 @@ class VirtualSwitch:
 
 
 class Radiator:
+    """Radiator thermostat setpoint and temperature readout"""
+
     def __init__(self, radiatorType: Rooms, idxTemp, idxSetPoint):
         self.radiatorType = radiatorType
         self.idxTemp = idxTemp
@@ -181,6 +200,8 @@ class Radiator:
 
 
 class RelayActuator:
+    """On/Off relay actuator"""
+
     def __init__(self, idx):
         self.idx = idx
         self.state = None
@@ -218,6 +239,11 @@ class PluginDevices:
             for i, tempIdx in enumerate(tempIdxs):
                 setPointIdx = setPointIdxs[i]
                 self.radiators.append(Radiator(radType, tempIdx, setPointIdx))
+        self.switches = dict([(du, VirtualSwitch(du)) for du in DeviceUnits])
+        self.ThermostatControlSwitch = self.switches[DeviceUnits.ThermostatControl]
+        self.ThermostatModeSwitch = self.switches[DeviceUnits.ThermostatMode]
+        self.Room1PresenceSwitch = self.switches[DeviceUnits.Room1Presence]
+        self.Room2PresenceSwitch = self.switches[DeviceUnits.Room2Presence]
 
     def ReadTemperatures(self):
         global z
@@ -299,6 +325,7 @@ def onStop():
 def onCommand(Unit, Command, Level, Color):
     global z
     z.onCommand(Unit, Command, Level, Color)
+    devices.switches[DeviceUnits(Unit)].SetValue(Command, Level, Color)
 
 
 def onHeartbeat():
