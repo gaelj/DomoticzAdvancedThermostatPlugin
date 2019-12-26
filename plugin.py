@@ -184,7 +184,7 @@ class Radiator:
         self.measuredTemperature = None
         self.setPointTemperature = None
 
-    def SetSetPoint(self, setPoint):
+    def SetValue(self, setPoint):
         self.setPointTemperature = setPoint
 
     def Read(self):
@@ -198,7 +198,7 @@ class RelayActuator:
         self.idx = idx
         self.state = None
 
-    def SetState(self, state: bool):
+    def SetValue(self, state: bool):
         global z
         if self.state != state:
             command = "On" if state else "Off"
@@ -328,7 +328,7 @@ def onCommand(Unit, Command, Level, Color):
     z.WriteLog("DU: " + str(du))
     if du == DeviceUnits.Room1Presence:
         z.WriteLog("Set thermostat switch to: " + str(value > 0))
-        devices.ThermostatControlSwitch.SetValue((value > 0))
+        devices.boiler.SetValue((value > 0))
     # onHeartbeat()
 
 
