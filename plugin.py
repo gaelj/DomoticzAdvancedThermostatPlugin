@@ -167,8 +167,8 @@ class Radiator:
         self.radiatorType = radiatorType
         self.idxTemp = idxTemp
         self.idxSetPoint = idxSetPoint
-        self.measuredTemperature: int = None
-        self.setPointTemperature: int = None
+        self.measuredTemperature = None
+        self.setPointTemperature = None
 
     def SetSetPoint(self, setPoint):
         self.setPointTemperature = setPoint
