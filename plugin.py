@@ -402,8 +402,9 @@ def Regulate():
         boilerCommand = False
 
     # radiator: Radiator
-    thermostatControlValue = ThermostatControlValues(
-        pluginDevices.thermostatControlSwitch.Read())
+    thermostatControlValue = pluginDevices.thermostatControlSwitch.Read()
+    z.WriteLog("ThermostatControlValue: " + str(thermostatControlValue))
+    thermostatControlValue = ThermostatControlValues(thermostatControlValue)
     if thermostatControlValue == ThermostatControlValues.Off:
         pluginDevices.boiler.SetValue(False)
     else:
