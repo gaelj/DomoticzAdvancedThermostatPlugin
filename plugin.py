@@ -339,11 +339,11 @@ class PluginDevices:
         self.exterior = OutsideWeather(self.config.ExteriorTempSensorsIdx)
         self.boiler = RelayActuator(self.config.BoilerRelayIdx)
         self.radiators = []
+        expectedTemps = self.config.ExpectedTemps
+        comfortExtras = self.config.ComfortExtras
         for radType in self.config.InsideTempSensorIdxs:
             tempIdxs = self.config.InsideTempSensorIdxs[radType]
             setPointIdxs = self.config.RadiatorSetpointsIdxs[radType]
-            expectedTemps = self.config.ExpectedTemps[radType]
-            comfortExtras = self.config.ComfortExtras[radType]
             for i, tempIdx in enumerate(tempIdxs):
                 setPointIdx = setPointIdxs[i]
                 radiatorExpectedTemps = {}
