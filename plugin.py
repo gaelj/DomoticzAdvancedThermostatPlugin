@@ -420,20 +420,19 @@ def Regulate():
 def onStart():
     global z
     global pluginDevices
+    # prod
+    # from DomoticzWrapperClass import \
     # dev
     # from DomoticzWrapper.DomoticzWrapperClass import \
-    # prod
-    from DomoticzWrapperClass import \
-        DomoticzTypeName, DomoticzDebugLevel, DomoticzPluginParameters, \
-        DomoticzWrapper, DomoticzDevice, DomoticzConnection, DomoticzImage, \
-        DomoticzDeviceType, DomoticzDeviceTypes
+    #     DomoticzTypeName, DomoticzDebugLevel, DomoticzPluginParameters, \
+    #     DomoticzWrapper, DomoticzDevice, DomoticzConnection, DomoticzImage, \
+    #     DomoticzDeviceType
 
     # dev
     # from DomoticzWrapper.DomoticzPluginHelper import \
     # prod
     from DomoticzPluginHelper import \
-        DomoticzPluginHelper, DeviceParam, ParseCSV
-
+        DomoticzPluginHelper, DeviceParam, ParseCSV, DomoticzDeviceTypes
 
     z = DomoticzPluginHelper(
         Domoticz, Settings, Parameters, Devices, Images, {})
