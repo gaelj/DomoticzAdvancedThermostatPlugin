@@ -379,7 +379,7 @@ def onCommand(Unit, Command, Level, Color):
     if du == DeviceUnits.Room1Presence:
         val = 19.5 if (value == 0) else 25.5
         z.WriteLog("Set rad thermostat " +
-                   pluginDevices.radiators[0] + " to: " + str(val))
+                   pluginDevices.radiators[0].radiatorType.name + " to: " + str(val))
         pluginDevices.radiators[0].SetValue(val)
     onHeartbeat()
 
