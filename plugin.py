@@ -193,11 +193,14 @@ class Radiator:
         global z
         global pluginDevices
         self.setPointTemperature = setPoint
+        z.DomoticzAPI("type=setused&idx={}&setpoint={}&used=true".format(
+            self.idxSetPoint, setPoint))
 
     @classmethod
-    def ReadAll(cls, radiators):
+    def ReadAll(cls):
         global z
         global pluginDevices
+        radiators = pluginDevices.radiators
         devicesAPI = z.DomoticzAPI(
             "type=devices&filter=temp&used=true&order=Name")
         if devicesAPI:
@@ -211,7 +214,8 @@ class Radiator:
                         # check temp sensor is not timed out
                         if not z.SensorTimedOut(idx, device["Name"], device["LastUpdate"]):
                             radiator.measuredTemperature = device["Temp"]
-                            z.WriteLog("Radiator temp " + device["Name"] + ": " + str(device["Temp"]))
+                            z.WriteLog(
+                                "Radiator temp " + device["Name"] + ": " + str(device["Temp"]))
                     else:
                         Domoticz.Error(
                             "device: {}-{} is not a Temperature sensor".format(device["idx"], device["Name"]))
@@ -280,7 +284,7 @@ class PluginDevices:
     def ReadTemperatures(self):
         global z
         global pluginDevices
-        Radiator.ReadAll(pluginDevices.radiators)
+        Radiator.ReadAll()
         self.exterior.Read()
 
 
@@ -307,44 +311,44 @@ def onStart():
     z.onStart()
 
     z.InitDevice('Thermostat Control', DeviceUnits.ThermostatControl,
-                    DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
-                    Used=True,
-                    Options={"LevelActions": "||||",
-                            "LevelNames": "Off|Away|Night|Auto|Forced",
-                            "LevelOffHidden": "false",
-                            "SelectorStyle": "0"},
-                    defaultNValue=0,
-                    defaultSValue="0")
+                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
+                 Used=True,
+                 Options={"LevelActions": "||||",
+                          "LevelNames": "Off|Away|Night|Auto|Forced",
+                          "LevelOffHidden": "false",
+                          "SelectorStyle": "0"},
+                 defaultNValue=0,
+                 defaultSValue="0")
 
     z.InitDevice('Thermostat Mode', DeviceUnits.ThermostatMode,
-                    DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
-                    Used=True,
-                    Options={"LevelActions": "||",
-                            "LevelNames": "Off|Normal|Comfort",
-                            "LevelOffHidden": "true",
-                            "SelectorStyle": "0"},
-                    defaultNValue=0,
-                    defaultSValue="10")
+                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
+                 Used=True,
+                 Options={"LevelActions": "||",
+                          "LevelNames": "Off|Normal|Comfort",
+                          "LevelOffHidden": "true",
+                          "SelectorStyle": "0"},
+                 defaultNValue=0,
+                 defaultSValue="10")
 
     z.InitDevice('Room 1 Presence', DeviceUnits.Room1Presence,
-                    DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
-                    Used=True,
-                    Options={"LevelActions": "|",
-                            "LevelNames": "Absent|Present",
-                            "LevelOffHidden": "false",
-                            "SelectorStyle": "0"},
-                    defaultNValue=0,
-                    defaultSValue="0")
+                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
+                 Used=True,
+                 Options={"LevelActions": "|",
+                          "LevelNames": "Absent|Present",
+                          "LevelOffHidden": "false",
+                          "SelectorStyle": "0"},
+                 defaultNValue=0,
+                 defaultSValue="0")
 
     z.InitDevice('Room 2 Presence', DeviceUnits.Room2Presence,
-                    DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
-                    Used=True,
-                    Options={"LevelActions": "|",
-                            "LevelNames": "Absent|Present",
-                            "LevelOffHidden": "false",
-                            "SelectorStyle": "0"},
-                    defaultNValue=0,
-                    defaultSValue="0")
+                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
+                 Used=True,
+                 Options={"LevelActions": "|",
+                          "LevelNames": "Absent|Present",
+                          "LevelOffHidden": "false",
+                          "SelectorStyle": "0"},
+                 defaultNValue=0,
+                 defaultSValue="0")
 
     pluginDevices = PluginDevices()
 
@@ -372,6 +376,12 @@ def onCommand(Unit, Command, Level, Color):
     #     z.WriteLog("Set thermostat switch to: " + str(value > 0))
     #     pluginDevices.boiler.SetValue((value > 0))
     # onHeartbeat()
+    if du == DeviceUnits.Room1Presence:
+        val = 19.5 if (value == 0) else 25.5
+        z.WriteLog("Set rad thermostat " +
+                   pluginDevices.radiators[0] + " to: " + str(val))
+        pluginDevices.radiators[0].SetValue(val)
+    onHeartbeat()
 
 
 def onHeartbeat():
