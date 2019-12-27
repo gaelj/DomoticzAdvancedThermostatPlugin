@@ -380,7 +380,6 @@ def ApplySetPoints():
     room2PresenceValue = PresenceValues(
         pluginDevices.room2PresenceSwitch.Read())
 
-    radiator: Radiator
     for radiator in pluginDevices.radiators:
         setPoint = radiator.radiatorExpectedTemps[thermostatControlValue] + \
             radiator.radiatorComfortExtras[thermostatModeValue]
