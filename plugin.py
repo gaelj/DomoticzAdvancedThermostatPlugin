@@ -351,7 +351,7 @@ class PluginDevices:
                 for controlValue in expectedTemps:
                     radiatorExpectedTemps[controlValue] = expectedTemps[controlValue][radType][i]
                 for modeValue in comfortExtras:
-                    radiatorComfortExtras[modeValue] = comfortExtras[controlValue][radType][i]
+                    radiatorComfortExtras[modeValue] = comfortExtras[modeValue][radType][i]
                 self.radiators.append(Radiator(
                     radType, tempIdx, setPointIdx, radiatorExpectedTemps, radiatorComfortExtras))
         self.switches = dict([(du, VirtualSwitch(du)) for du in DeviceUnits])
