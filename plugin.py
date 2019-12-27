@@ -120,17 +120,64 @@ class PluginConfig:
 
     def __init__(self):
         self.InsideTempSensorIdxs = {
-            Rooms.Bedroom: [18, 45],     # palier , chambre
+            Rooms.Bedroom: [45],         # chambre
+            Rooms.Landing: [18],         # palier
             Rooms.LivingRoom: [73, 37],  # Canapé, rue, (TV)
             Rooms.Desk: [6],             # Bureau
         }
         self.RadiatorSetpointsIdxs = {
-            Rooms.Bedroom: [17, 32],
+            Rooms.Bedroom: [32],
+            Rooms.Landing: [17],
             Rooms.LivingRoom: [34, 36, 53],
             Rooms.Desk: [5],
         }
         self.ExteriorTempSensorsIdx = 116
         self.BoilerRelayIdx = 50
+
+        self.ExpectedTemps = {
+            ThermostatControlValues.Off: {
+                Rooms.Bedroom: [15],
+                Rooms.Landing: [17],
+                Rooms.LivingRoom: [14, 13, 14],
+                Rooms.Desk: [15], },
+            ThermostatControlValues.Away: {
+                Rooms.Bedroom: [15],
+                Rooms.Landing: [17],
+                Rooms.LivingRoom: [14, 13, 14],
+                Rooms.Desk: [15], },
+            ThermostatControlValues.Night: {
+                Rooms.Bedroom: [16],
+                Rooms.Landing: [16],
+                Rooms.LivingRoom: [15, 14, 15],
+                Rooms.Desk: [16], },
+            ThermostatControlValues.Auto: {
+                Rooms.Bedroom: [16],
+                Rooms.Landing: [18],
+                Rooms.LivingRoom: [20, 17, 20],
+                Rooms.Desk: [21], },
+            ThermostatControlValues.Forced: {
+                Rooms.Bedroom: [16],
+                Rooms.Landing: [18],
+                Rooms.LivingRoom: [20, 17, 20],
+                Rooms.Desk: [21], },
+        }
+        self.ComfortExtras = {
+            ThermostatModeValues.Off: {
+                Rooms.Bedroom: [0],
+                Rooms.Landing: [0],
+                Rooms.LivingRoom: [0, 0, 0],
+                Rooms.Desk: [0], },
+            ThermostatModeValues.Normal: {
+                Rooms.Bedroom: [0],
+                Rooms.Landing: [0],
+                Rooms.LivingRoom: [0, 0, 0],
+                Rooms.Desk: [0], },
+            ThermostatModeValues.Comfort: {
+                Rooms.Bedroom: [0],
+                Rooms.Landing: [0],
+                Rooms.LivingRoom: [2, 1, 2],
+                Rooms.Desk: [1], },
+        }
 
 
 class DeviceUnits(IntEnum):
@@ -146,6 +193,26 @@ class Rooms(IntEnum):
     Bedroom = 0
     LivingRoom = 1
     Desk = 2
+    Landing = 3
+
+
+class ThermostatControlValues(IntEnum):
+    Off = 0
+    Away = 10
+    Night = 20
+    Auto = 30
+    Forced = 40
+
+
+class ThermostatModeValues(IntEnum):
+    Off = 0
+    Normal = 10
+    Comfort = 20
+
+
+class PresenceValues(IntEnum):
+    Absent = 0
+    Present = 10
 
 
 class VirtualSwitch:
@@ -180,7 +247,7 @@ class VirtualSwitch:
 class Radiator:
     """Radiator thermostat setpoint and temperature readout"""
 
-    def __init__(self, radiatorType: Rooms, idxTemp, idxSetPoint):
+    def __init__(self, radiatorType: Rooms, idxTemp, idxSetPoint, expectedTemps, comfortExtras):
         global z
         global pluginDevices
         self.radiatorType = radiatorType
@@ -188,13 +255,16 @@ class Radiator:
         self.idxSetPoint = idxSetPoint
         self.measuredTemperature = None
         self.setPointTemperature = None
+        self.expectedTemps = expectedTemps
+        self.comfortExtras = comfortExtras
 
     def SetValue(self, setPoint):
         global z
         global pluginDevices
-        self.setPointTemperature = setPoint
-        z.DomoticzAPI("type=setused&idx={}&setpoint={}&used=true".format(
-            self.idxSetPoint, setPoint))
+        if self.setPointTemperature != setPoint:
+            self.setPointTemperature = setPoint
+            z.DomoticzAPI("type=setused&idx={}&setpoint={}&used=true".format(
+                self.idxSetPoint, setPoint))
 
     @classmethod
     def ReadAll(cls):
@@ -272,9 +342,18 @@ class PluginDevices:
         for radType in self.config.InsideTempSensorIdxs:
             tempIdxs = self.config.InsideTempSensorIdxs[radType]
             setPointIdxs = self.config.RadiatorSetpointsIdxs[radType]
+            expectedTemps = self.ExpectedTemps[radType]
+            comfortExtras = self.ComfortExtras[radType]
             for i, tempIdx in enumerate(tempIdxs):
                 setPointIdx = setPointIdxs[i]
-                self.radiators.append(Radiator(radType, tempIdx, setPointIdx))
+                radiatorExpectedTemps = {}
+                radiatorComfortExtras = {}
+                for controlValue in expectedTemps:
+                    radiatorExpectedTemps[controlValue] = expectedTemps[controlValue][radType][i]
+                for modeValue in comfortExtras:
+                    radiatorComfortExtras[modeValue] = comfortExtras[controlValue][radType][i]
+                self.radiators.append(Radiator(
+                    radType, tempIdx, setPointIdx, radiatorExpectedTemps, radiatorComfortExtras))
         self.switches = dict([(du, VirtualSwitch(du)) for du in DeviceUnits])
         self.thermostatControlSwitch = self.switches[DeviceUnits.ThermostatControl]
         self.thermostatModeSwitch = self.switches[DeviceUnits.ThermostatMode]
@@ -286,6 +365,57 @@ class PluginDevices:
         global pluginDevices
         Radiator.ReadAll()
         self.exterior.Read()
+
+
+def ApplySetPoints():
+    global z
+    global pluginDevices
+
+    thermostatControlValue = ThermostatControlValues(
+        pluginDevices.thermostatControlSwitch.Read())
+    thermostatModeValue = ThermostatModeValues(
+        pluginDevices.thermostatModeSwitch.Read())
+    room1PresenceValue = PresenceValues(
+        pluginDevices.room1PresenceSwitch.Read())
+    room2PresenceValue = PresenceValues(
+        pluginDevices.room2PresenceSwitch.Read())
+
+    radiator: Radiator
+    for radiator in pluginDevices.radiators:
+        setPoint = radiator.radiatorExpectedTemps[thermostatControlValue] + \
+            radiator.radiatorComfortExtras[thermostatModeValue]
+        radiator.SetValue(setPoint)
+
+    # for room in pluginDevices.config.RadiatorSetpointsIdxs:
+    #     for i, index in enumerate(pluginDevices.config.RadiatorSetpointsIdxs[room]):
+    #         radiators
+
+
+def Regulate():
+    global z
+    global pluginDevices
+
+    now = datetime.now()
+    pluginDevices.ReadTemperatures()
+    boilerCommand = pluginDevices.boiler.state
+
+    if boilerCommand is None:
+        boilerCommand = False
+
+    # radiator: Radiator
+    thermostatControlValue = ThermostatControlValues(
+        pluginDevices.thermostatControlSwitch.Read())
+    if thermostatControlValue == ThermostatControlValues.Off:
+        pluginDevices.boiler.SetValue(False)
+    else:
+        underTempRads = [
+            r for r in pluginDevices.radiators if r.measuredTemperature < (r.setPointTemperature - 1)]
+        overTempRads = [r for r in pluginDevices.radiators if r.measuredTemperature >= (
+            r.setPointTemperature)]
+        if not boilerCommand and len(underTempRads) > 0:
+            pluginDevices.boiler.SetValue(True)
+        elif boilerCommand and len(overTempRads) > 0 and len(underTempRads) == 0:
+            pluginDevices.boiler.SetValue(False)
 
 
 def onStart():
@@ -376,11 +506,11 @@ def onCommand(Unit, Command, Level, Color):
     #     z.WriteLog("Set thermostat switch to: " + str(value > 0))
     #     pluginDevices.boiler.SetValue((value > 0))
     # onHeartbeat()
-    if du == DeviceUnits.Room1Presence:
-        val = 19.5 if (value == 0) else 25.5
-        z.WriteLog("Set rad thermostat " +
-                   pluginDevices.radiators[0].radiatorType.name + " to: " + str(val))
-        pluginDevices.radiators[0].SetValue(val)
+    # if du == DeviceUnits.Room1Presence:
+    #     val = 19.5 if (value == 0) else 25.5
+    #     z.WriteLog("Set rad thermostat " +
+    #                pluginDevices.radiators[0].radiatorType.name + " to: " + str(val))
+    #     pluginDevices.radiators[0].SetValue(val)
     onHeartbeat()
 
 
@@ -388,13 +518,4 @@ def onHeartbeat():
     global z
     global pluginDevices
     z.onHeartbeat()
-    now = datetime.now()
-    pluginDevices.ReadTemperatures()
-    z.WriteLog("pluginDevices.thermostatControlSwitch.Read() => " +
-               str(pluginDevices.thermostatControlSwitch.Read()))
-    z.WriteLog("pluginDevices.thermostatModeSwitch.Read() => " +
-               str(pluginDevices.thermostatModeSwitch.Read()))
-    z.WriteLog("pluginDevices.room1PresenceSwitch.Read() => " +
-               str(pluginDevices.room1PresenceSwitch.Read()))
-    z.WriteLog("pluginDevices.room2PresenceSwitch.Read() => " +
-               str(pluginDevices.room2PresenceSwitch.Read()))
+    Regulate()
