@@ -342,8 +342,8 @@ class PluginDevices:
         for radType in self.config.InsideTempSensorIdxs:
             tempIdxs = self.config.InsideTempSensorIdxs[radType]
             setPointIdxs = self.config.RadiatorSetpointsIdxs[radType]
-            expectedTemps = self.ExpectedTemps[radType]
-            comfortExtras = self.ComfortExtras[radType]
+            expectedTemps = self.config.ExpectedTemps[radType]
+            comfortExtras = self.config.ComfortExtras[radType]
             for i, tempIdx in enumerate(tempIdxs):
                 setPointIdx = setPointIdxs[i]
                 radiatorExpectedTemps = {}
