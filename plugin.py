@@ -362,16 +362,16 @@ def ApplySetPoints():
             ri = pluginDevices.config.RoomIndexes[radiator.radiatorType]
             if ri == 1:
                 if room1PresenceValue or int(thermostatControlValue) < 30:
-                    setPoint = radiator.radiatorExpectedTemps[thermostatControlValue]
+                    setPoint = radiator.expectedTemps[thermostatControlValue]
                 else:
-                    setPoint = radiator.radiatorExpectedTemps[ThermostatControlValues.Away]
+                    setPoint = radiator.expectedTemps[ThermostatControlValues.Away]
             elif ri == 2:
                 if room2PresenceValue or int(thermostatControlValue) < 30:
-                    setPoint = radiator.radiatorExpectedTemps[thermostatControlValue]
+                    setPoint = radiator.expectedTemps[thermostatControlValue]
                 else:
-                    setPoint = radiator.radiatorExpectedTemps[ThermostatControlValues.Away]
+                    setPoint = radiator.expectedTemps[ThermostatControlValues.Away]
             else:
-                setPoint = radiator.radiatorExpectedTemps[thermostatControlValue]
+                setPoint = radiator.expectedTemps[thermostatControlValue]
             radiator.SetValue(setPoint)
     else:
         z.WriteLog("thermostatControlValue is None")
