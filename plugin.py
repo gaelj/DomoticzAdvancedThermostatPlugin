@@ -315,7 +315,6 @@ class PluginDevices:
         self.boiler = RelayActuator(self.config.BoilerRelayIdx)
         self.radiators = []
         expectedTemps = self.config.ExpectedTemps
-        comfortExtras = self.config.ComfortExtras
         for radType in self.config.InsideTempSensorIdxs:
             tempIdxs = self.config.InsideTempSensorIdxs[radType]
             setPointIdxs = self.config.RadiatorSetpointsIdxs[radType]
@@ -325,8 +324,6 @@ class PluginDevices:
                 radiatorComfortExtras = {}
                 for controlValue in expectedTemps:
                     radiatorExpectedTemps[controlValue] = expectedTemps[controlValue][radType][i]
-                for modeValue in comfortExtras:
-                    radiatorComfortExtras[modeValue] = comfortExtras[modeValue][radType][i]
                 self.radiators.append(Radiator(
                     radType, tempIdx, setPointIdx, radiatorExpectedTemps, radiatorComfortExtras))
         self.switches = dict([(du, VirtualSwitch(du)) for du in DeviceUnits])
