@@ -221,7 +221,7 @@ class VirtualSwitch:
         global z
         global pluginDevices
         d = z.Devices[self.pluginDeviceUnit.value]
-        self.value = d.sValue if d.sValue is not None and d.sValue != "" else int(d.nValue) if d.nValue is not None else None
+        self.value = int(d.sValue) if d.sValue is not None and d.sValue != "" else int(d.nValue) if d.nValue is not None else None
         return self.value
 
 
