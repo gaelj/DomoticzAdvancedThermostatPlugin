@@ -221,7 +221,8 @@ class VirtualSwitch:
         global z
         global pluginDevices
         d = z.Devices[self.pluginDeviceUnit.value]
-        self.value = int(d.sValue) if d.sValue is not None and d.sValue != "" else int(d.nValue) if d.nValue is not None else None
+        self.value = int(d.sValue) if d.sValue is not None and d.sValue != "" else int(
+            d.nValue) if d.nValue is not None else None
         return self.value
 
 
@@ -353,9 +354,13 @@ def ApplySetPoints():
     z.WriteLog("thermostatControlValue: " + str(thermostatControlValue))
     z.WriteLog("room1PresenceValue: " + str(room1PresenceValue))
     z.WriteLog("room2PresenceValue: " + str(room2PresenceValue))
-    thermostatControlValue = ThermostatControlValues(thermostatControlValue) if thermostatControlValue is not None else None
-    room1PresenceValue = PresenceValues(room1PresenceValue) if room1PresenceValue is not None else None
-    room2PresenceValue = PresenceValues(room2PresenceValue) if room2PresenceValue is not None else None
+
+    thermostatControlValue = ThermostatControlValues(
+        thermostatControlValue) if thermostatControlValue is not None else None
+    room1PresenceValue = PresenceValues(
+        room1PresenceValue) if room1PresenceValue is not None else None
+    room2PresenceValue = PresenceValues(
+        room2PresenceValue) if room2PresenceValue is not None else None
 
     if thermostatControlValue is not None:
         for radiator in pluginDevices.radiators:
@@ -391,7 +396,8 @@ def Regulate():
     # radiator: Radiator
     thermostatControlValue = pluginDevices.thermostatControlSwitch.Read()
     z.WriteLog("ThermostatControlValue: " + str(thermostatControlValue))
-    thermostatControlValue = ThermostatControlValues(int(thermostatControlValue))
+    thermostatControlValue = ThermostatControlValues(
+        int(thermostatControlValue))
     if thermostatControlValue == ThermostatControlValues.Off:
         pluginDevices.boiler.SetValue(False)
     else:
@@ -399,8 +405,10 @@ def Regulate():
             r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.setPointTemperature is not None and int(r.measuredTemperature) < (int(r.setPointTemperature) - 1)]
         overTempRads = [r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.setPointTemperature is not None and int(r.measuredTemperature) >= int(
             r.setPointTemperature)]
-        z.WriteLog("Under-temp radiators: " + str(len(underTempRads)))
-        z.WriteLog("Over-temp radiators: " + str(len(overTempRads)))
+        for rad in underTempRads:
+            z.WriteLog("Under-temp radiator: " + rad.radiatorType.name)
+        for rad in overTempRads:
+            z.WriteLog("Over-temp radiator: " + rad.radiatorType.name)
         if not boilerCommand and len(underTempRads) > 0:
             pluginDevices.boiler.SetValue(True)
         elif boilerCommand and len(overTempRads) > 0 and len(underTempRads) == 0:
@@ -482,16 +490,6 @@ def onCommand(Unit, Command, Level, Color):
         value = Level
     du = DeviceUnits(Unit)
     pluginDevices.switches[du].SetValue(value)
-    z.WriteLog("DU: " + str(du))
-    # if du == DeviceUnits.Room1Presence:
-    #     z.WriteLog("Set thermostat switch to: " + str(value > 0))
-    #     pluginDevices.boiler.SetValue((value > 0))
-    # onHeartbeat()
-    # if du == DeviceUnits.Room1Presence:
-    #     val = 19.5 if (value == 0) else 25.5
-    #     z.WriteLog("Set rad thermostat " +
-    #                pluginDevices.radiators[0].radiatorType.name + " to: " + str(val))
-    #     pluginDevices.radiators[0].SetValue(val)
     ApplySetPoints()
     Regulate()
 
