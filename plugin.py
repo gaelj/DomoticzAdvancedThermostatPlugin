@@ -63,13 +63,13 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
         <param field="Port"     label="Port"                                                         width="40px"  required="true"  default="8080"      />
         <param field="Username" label="Username"                                                     width="200px" required="false" default=""          />
         <param field="Password" label="Password"                                                     width="200px" required="false" default=""          />
-        <param field="Mode1" label="Apply minimum heating per cycle" required="false" width="200px">
+        <param field="Mode1" label="Apply minimum heating per cycle" width="200px">
             <options>
 				<option label="ony when heating required" value="Normal"  default="true" />
                 <option label="always" value="Forced"/>
             </options>
         </param>
-        <param field="Mode2" required="false" label="Calculation cycle, Minimum Heating time per cycle, Pause On delay, Pause Off delay, Forced mode duration (all in minutes)" width="200px" required="true" default="30,0,2,1,60"/>
+        <param field="Mode2" label="Calculation cycle, Minimum Heating time per cycle, Pause On delay, Pause Off delay, Forced mode duration (all in minutes)" width="200px" required="true" default="30,0,2,1,60"/>
         <param field="Mode3" label="Logging Level" width="200px">
             <options>
                 <option label="Normal" value="Normal" default="true"/>
