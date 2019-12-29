@@ -412,7 +412,7 @@ def onStart():
     z.onStart()
 
     z.InitDevice('Thermostat Control', DeviceUnits.ThermostatControl,
-                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
+                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector(),
                  Used=True,
                  Options={"LevelActions": "||||",
                           "LevelNames": "Off|Away|Night|Normal|Comfort",
@@ -422,7 +422,7 @@ def onStart():
                  defaultSValue="0")
 
     z.InitDevice('Room 1 Presence', DeviceUnits.Room1Presence,
-                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
+                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector(),
                  Used=True,
                  Options={"LevelActions": "|",
                           "LevelNames": "Absent|Present",
@@ -432,7 +432,7 @@ def onStart():
                  defaultSValue="0")
 
     z.InitDevice('Room 2 Presence', DeviceUnits.Room2Presence,
-                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
+                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector(),
                  Used=True,
                  Options={"LevelActions": "|",
                           "LevelNames": "Absent|Present",
