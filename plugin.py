@@ -222,7 +222,7 @@ class VirtualSwitch:
 class Radiator:
     """Radiator thermostat setpoint and temperature readout"""
 
-    def __init__(self, radiatorType: Rooms, idxTemp, idxSetPoint, expectedTemps, comfortExtras):
+    def __init__(self, radiatorType: Rooms, idxTemp, idxSetPoint, expectedTemps):
         global z
         global pluginDevices
         self.radiatorType = radiatorType
@@ -231,7 +231,6 @@ class Radiator:
         self.measuredTemperature = None
         self.setPointTemperature = None
         self.expectedTemps = expectedTemps
-        self.comfortExtras = comfortExtras
 
     def SetValue(self, setPoint):
         global z
@@ -321,11 +320,10 @@ class PluginDevices:
             for i, tempIdx in enumerate(tempIdxs):
                 setPointIdx = setPointIdxs[i]
                 radiatorExpectedTemps = {}
-                radiatorComfortExtras = {}
                 for controlValue in expectedTemps:
                     radiatorExpectedTemps[controlValue] = expectedTemps[controlValue][radType][i]
                 self.radiators.append(Radiator(
-                    radType, tempIdx, setPointIdx, radiatorExpectedTemps, radiatorComfortExtras))
+                    radType, tempIdx, setPointIdx, radiatorExpectedTemps))
         self.switches = dict([(du, VirtualSwitch(du)) for du in DeviceUnits])
         self.thermostatControlSwitch = self.switches[DeviceUnits.ThermostatControl]
         self.room1PresenceSwitch = self.switches[DeviceUnits.Room1Presence]
@@ -353,10 +351,6 @@ def ApplySetPoints():
         setPoint = radiator.radiatorExpectedTemps[thermostatControlValue]
         radiator.SetValue(setPoint)
 
-    # for room in pluginDevices.config.RadiatorSetpointsIdxs:
-    #     for i, index in enumerate(pluginDevices.config.RadiatorSetpointsIdxs[room]):
-    #         radiators
-
 
 def Regulate():
     global z
@@ -380,6 +374,10 @@ def Regulate():
             r for r in pluginDevices.radiators if int(r.measuredTemperature) < (int(r.setPointTemperature) - 1)]
         overTempRads = [r for r in pluginDevices.radiators if int(r.measuredTemperature) >= int(
             r.setPointTemperature)]
+        z.WriteLog("Under-temp radiators: " + str(len(underTempRads)))
+        z.WriteLog("Over-temp radiators: " + str(len(overTempRads)))
+        for r in pluginDevices.radiators:
+            z.WriteLog("Temp " + r.radiatorType.name + ": " + str(r.measuredTemperature))
         if not boilerCommand and len(underTempRads) > 0:
             pluginDevices.boiler.SetValue(True)
         elif boilerCommand and len(overTempRads) > 0 and len(underTempRads) == 0:
@@ -471,7 +469,8 @@ def onCommand(Unit, Command, Level, Color):
     #     z.WriteLog("Set rad thermostat " +
     #                pluginDevices.radiators[0].radiatorType.name + " to: " + str(val))
     #     pluginDevices.radiators[0].SetValue(val)
-    onHeartbeat()
+    ApplySetPoints()
+    Regulate()
 
 
 def onHeartbeat():
