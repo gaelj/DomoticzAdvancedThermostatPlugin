@@ -406,7 +406,6 @@ def onStart():
     z.onStart()
 
     LightSwitch_Switch_Selector = DomoticzDeviceTypes.LightSwitch_Switch_Selector()
-    z.WriteLog("type_id: " + str(LightSwitch_Switch_Selector.type_id))
 
     z.InitDevice('Thermostat Control', DeviceUnits.ThermostatControl,
                  DeviceType=LightSwitch_Switch_Selector,
@@ -439,6 +438,7 @@ def onStart():
                  defaultSValue="0")
 
     pluginDevices = PluginDevices()
+    ApplySetPoints()
 
 
 def onStop():
