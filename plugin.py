@@ -376,8 +376,6 @@ def Regulate():
             r.setPointTemperature)]
         z.WriteLog("Under-temp radiators: " + str(len(underTempRads)))
         z.WriteLog("Over-temp radiators: " + str(len(overTempRads)))
-        for r in pluginDevices.radiators:
-            z.WriteLog("Temp " + r.radiatorType.name + ": " + str(r.measuredTemperature))
         if not boilerCommand and len(underTempRads) > 0:
             pluginDevices.boiler.SetValue(True)
         elif boilerCommand and len(overTempRads) > 0 and len(underTempRads) == 0:
