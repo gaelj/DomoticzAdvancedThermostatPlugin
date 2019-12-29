@@ -411,6 +411,11 @@ def onStart():
         Domoticz, Settings, Parameters, Devices, Images, {})
     z.onStart()
 
+    z.Devices[0].Delete()
+    z.Devices[1].Delete()
+    z.Devices[2].Delete()
+    z.Devices[3].Delete()
+
     z.InitDevice('Thermostat Control', DeviceUnits.ThermostatControl,
                  DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
                  Used=True,
