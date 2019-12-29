@@ -49,8 +49,7 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
 
         <h3>Devices</h3>
         <ul style="list-style-type:square">
-            <li>Thermostat Control: Off|Away|Night|Auto|Forced</li>
-            <li>Thermostat Mode: Off|Normal|Comfort</li>
+            <li>Thermostat Control: Off|Away|Night|Normal|Comfort</li>
             <li>Room 1 Presence: Absent|Present</li>
             <li>Room 2 Presence: Absent|Present</li>
         </ul>
@@ -64,13 +63,13 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
         <param field="Port"     label="Port"                                                         width="40px"  required="true"  default="8080"      />
         <param field="Username" label="Username"                                                     width="200px" required="false" default=""          />
         <param field="Password" label="Password"                                                     width="200px" required="false" default=""          />
-        <param field="Mode1" label="Apply minimum heating per cycle" width="200px">
+        <param field="Mode1" label="Apply minimum heating per cycle" required="false" width="200px">
             <options>
 				<option label="ony when heating required" value="Normal"  default="true" />
                 <option label="always" value="Forced"/>
             </options>
         </param>
-        <param field="Mode2" label="Calculation cycle, Minimum Heating time per cycle, Pause On delay, Pause Off delay, Forced mode duration (all in minutes)" width="200px" required="true" default="30,0,2,1,60"/>
+        <param field="Mode2" required="false" label="Calculation cycle, Minimum Heating time per cycle, Pause On delay, Pause Off delay, Forced mode duration (all in minutes)" width="200px" required="true" default="30,0,2,1,60"/>
         <param field="Mode3" label="Logging Level" width="200px">
             <options>
                 <option label="Normal" value="Normal" default="true"/>
@@ -150,42 +149,24 @@ class PluginConfig:
                 Rooms.Landing: [16],
                 Rooms.LivingRoom: [15, 14, 15],
                 Rooms.Desk: [16], },
-            ThermostatControlValues.Auto: {
+            ThermostatControlValues.Normal: {
+                Rooms.Bedroom: [16],
+                Rooms.Landing: [18],
+                Rooms.LivingRoom: [19, 17, 19],
+                Rooms.Desk: [21], },
+            ThermostatControlValues.Comfort: {
                 Rooms.Bedroom: [16],
                 Rooms.Landing: [18],
                 Rooms.LivingRoom: [20, 17, 20],
-                Rooms.Desk: [21], },
-            ThermostatControlValues.Forced: {
-                Rooms.Bedroom: [16],
-                Rooms.Landing: [18],
-                Rooms.LivingRoom: [20, 17, 20],
-                Rooms.Desk: [21], },
-        }
-        self.ComfortExtras = {
-            ThermostatModeValues.Off: {
-                Rooms.Bedroom: [0],
-                Rooms.Landing: [0],
-                Rooms.LivingRoom: [0, 0, 0],
-                Rooms.Desk: [0], },
-            ThermostatModeValues.Normal: {
-                Rooms.Bedroom: [0],
-                Rooms.Landing: [0],
-                Rooms.LivingRoom: [0, 0, 0],
-                Rooms.Desk: [0], },
-            ThermostatModeValues.Comfort: {
-                Rooms.Bedroom: [0],
-                Rooms.Landing: [0],
-                Rooms.LivingRoom: [2, 1, 2],
-                Rooms.Desk: [1], },
+                Rooms.Desk: [22], },
         }
 
 
 class DeviceUnits(IntEnum):
     """Unit numbers of each virtual switch"""
     ThermostatControl = 1
-    ThermostatMode = 2
-    Room1Presence = 3
-    Room2Presence = 4
+    Room1Presence = 2
+    Room2Presence = 3
 
 
 class Rooms(IntEnum):
@@ -200,14 +181,8 @@ class ThermostatControlValues(IntEnum):
     Off = 0
     Away = 10
     Night = 20
-    Auto = 30
-    Forced = 40
-
-
-class ThermostatModeValues(IntEnum):
-    Off = 0
-    Normal = 10
-    Comfort = 20
+    Normal = 30
+    Comfort = 40
 
 
 class PresenceValues(IntEnum):
@@ -373,16 +348,13 @@ def ApplySetPoints():
 
     thermostatControlValue = ThermostatControlValues(
         pluginDevices.thermostatControlSwitch.Read())
-    thermostatModeValue = ThermostatModeValues(
-        pluginDevices.thermostatModeSwitch.Read())
     room1PresenceValue = PresenceValues(
         pluginDevices.room1PresenceSwitch.Read())
     room2PresenceValue = PresenceValues(
         pluginDevices.room2PresenceSwitch.Read())
 
     for radiator in pluginDevices.radiators:
-        setPoint = radiator.radiatorExpectedTemps[thermostatControlValue] + \
-            radiator.radiatorComfortExtras[thermostatModeValue]
+        setPoint = radiator.radiatorExpectedTemps[thermostatControlValue]
         radiator.SetValue(setPoint)
 
     # for room in pluginDevices.config.RadiatorSetpointsIdxs:
@@ -443,21 +415,11 @@ def onStart():
                  DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
                  Used=True,
                  Options={"LevelActions": "||||",
-                          "LevelNames": "Off|Away|Night|Auto|Forced",
+                          "LevelNames": "Off|Away|Night|Normal|Comfort",
                           "LevelOffHidden": "false",
                           "SelectorStyle": "0"},
                  defaultNValue=0,
                  defaultSValue="0")
-
-    z.InitDevice('Thermostat Mode', DeviceUnits.ThermostatMode,
-                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
-                 Used=True,
-                 Options={"LevelActions": "||",
-                          "LevelNames": "Off|Normal|Comfort",
-                          "LevelOffHidden": "true",
-                          "SelectorStyle": "0"},
-                 defaultNValue=0,
-                 defaultSValue="10")
 
     z.InitDevice('Room 1 Presence', DeviceUnits.Room1Presence,
                  DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector,
