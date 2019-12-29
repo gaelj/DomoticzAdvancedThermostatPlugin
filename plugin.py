@@ -17,7 +17,7 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
 
 """
 <plugin
-    key="AdvancedThermostat"
+    key="DomoticzAdvancedThermostat"
     name="DAT"
     author="gaelj"
     version="1.0.0"
