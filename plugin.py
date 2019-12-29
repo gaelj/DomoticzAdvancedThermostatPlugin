@@ -411,7 +411,7 @@ def onStart():
         Domoticz, Settings, Parameters, Devices, Images, {})
     z.onStart()
 
-    LightSwitch_Switch_Selector = DomoticzDeviceTypes.LightSwitch_Switch_Selector
+    LightSwitch_Switch_Selector = DomoticzDeviceTypes.LightSwitch_Switch_Selector()
     z.WriteLog("type_id: " + str(LightSwitch_Switch_Selector.type_id))
 
     z.InitDevice('Thermostat Control', DeviceUnits.ThermostatControl,
