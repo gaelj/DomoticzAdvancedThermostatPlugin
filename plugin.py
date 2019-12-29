@@ -34,8 +34,8 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
             <li>away</li>
             <li>night</li>
             <li>eco</li>
+            <li>Normal</li>
             <li>comfort</li>
-            <li>forced</li>
         </ul>
 
         <h3>Features</h3>
@@ -411,8 +411,11 @@ def onStart():
         Domoticz, Settings, Parameters, Devices, Images, {})
     z.onStart()
 
+    LightSwitch_Switch_Selector = DomoticzDeviceTypes.LightSwitch_Switch_Selector
+    z.WriteLog("type_id: " + str(LightSwitch_Switch_Selector.type_id))
+
     z.InitDevice('Thermostat Control', DeviceUnits.ThermostatControl,
-                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector(),
+                 DeviceType=LightSwitch_Switch_Selector,
                  Used=True,
                  Options={"LevelActions": "||||",
                           "LevelNames": "Off|Away|Night|Normal|Comfort",
@@ -422,7 +425,7 @@ def onStart():
                  defaultSValue="0")
 
     z.InitDevice('Room 1 Presence', DeviceUnits.Room1Presence,
-                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector(),
+                 DeviceType=LightSwitch_Switch_Selector,
                  Used=True,
                  Options={"LevelActions": "|",
                           "LevelNames": "Absent|Present",
@@ -432,7 +435,7 @@ def onStart():
                  defaultSValue="0")
 
     z.InitDevice('Room 2 Presence', DeviceUnits.Room2Presence,
-                 DeviceType=DomoticzDeviceTypes.LightSwitch_Switch_Selector(),
+                 DeviceType=LightSwitch_Switch_Selector,
                  Used=True,
                  Options={"LevelActions": "|",
                           "LevelNames": "Absent|Present",
