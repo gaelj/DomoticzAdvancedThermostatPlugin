@@ -371,8 +371,8 @@ def Regulate():
         pluginDevices.boiler.SetValue(False)
     else:
         underTempRads = [
-            r for r in pluginDevices.radiators if int(r.measuredTemperature) < (int(r.setPointTemperature) - 1)]
-        overTempRads = [r for r in pluginDevices.radiators if int(r.measuredTemperature) >= int(
+            r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.setPointTemperature is not None and int(r.measuredTemperature) < (int(r.setPointTemperature) - 1)]
+        overTempRads = [r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.setPointTemperature is not None and int(r.measuredTemperature) >= int(
             r.setPointTemperature)]
         z.WriteLog("Under-temp radiators: " + str(len(underTempRads)))
         z.WriteLog("Over-temp radiators: " + str(len(overTempRads)))
