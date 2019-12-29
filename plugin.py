@@ -130,6 +130,12 @@ class PluginConfig:
             Rooms.LivingRoom: [34, 36, 53],
             Rooms.Desk: [5],
         }
+        self.RoomIndexes = {
+            Rooms.Bedroom: 0,         # chambre
+            Rooms.Landing: 2,         # palier
+            Rooms.LivingRoom: 1,  # Canapé, rue, (TV)
+            Rooms.Desk: 2,
+        }
         self.ExteriorTempSensorsIdx = 116
         self.BoilerRelayIdx = 50
 
@@ -215,7 +221,7 @@ class VirtualSwitch:
         global z
         global pluginDevices
         d = z.Devices[self.pluginDeviceUnit.value]
-        self.value = d.sValue if d.sValue != "" else d.nValue
+        self.value = d.sValue if d.sValue is not None and d.sValue != "" else d.nValue
         return self.value
 
 
@@ -340,16 +346,32 @@ def ApplySetPoints():
     global z
     global pluginDevices
 
-    thermostatControlValue = ThermostatControlValues(
-        pluginDevices.thermostatControlSwitch.Read())
-    room1PresenceValue = PresenceValues(
-        pluginDevices.room1PresenceSwitch.Read())
-    room2PresenceValue = PresenceValues(
-        pluginDevices.room2PresenceSwitch.Read())
+    thermostatControlValue = pluginDevices.thermostatControlSwitch.Read()
+    room1PresenceValue = pluginDevices.room1PresenceSwitch.Read()
+    room2PresenceValue = pluginDevices.room2PresenceSwitch.Read()
 
-    for radiator in pluginDevices.radiators:
-        setPoint = radiator.radiatorExpectedTemps[thermostatControlValue]
-        radiator.SetValue(setPoint)
+    thermostatControlValue = ThermostatControlValues(thermostatControlValue) if thermostatControlValue is not None else None
+    room1PresenceValue = PresenceValues(room1PresenceValue) if room1PresenceValue is not None else None
+    room2PresenceValue = PresenceValues(room2PresenceValue) if room2PresenceValue is not None else None
+
+    if thermostatControlValue is not None:
+        for radiator in pluginDevices.radiators:
+            ri = pluginDevices.config.RoomIndexes[radiator.radiatorType]
+            if ri == 1:
+                if room1PresenceValue or int(thermostatControlValue) < 30:
+                    setPoint = radiator.radiatorExpectedTemps[thermostatControlValue]
+                else:
+                    setPoint = radiator.radiatorExpectedTemps[ThermostatControlValues.Away]
+            elif ri == 2:
+                if room2PresenceValue or int(thermostatControlValue) < 30:
+                    setPoint = radiator.radiatorExpectedTemps[thermostatControlValue]
+                else:
+                    setPoint = radiator.radiatorExpectedTemps[ThermostatControlValues.Away]
+            else:
+                setPoint = radiator.radiatorExpectedTemps[thermostatControlValue]
+            radiator.SetValue(setPoint)
+    else:
+        z.WriteLog("thermostatControlValue is None")
 
 
 def Regulate():
