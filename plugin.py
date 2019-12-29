@@ -350,6 +350,9 @@ def ApplySetPoints():
     room1PresenceValue = pluginDevices.room1PresenceSwitch.Read()
     room2PresenceValue = pluginDevices.room2PresenceSwitch.Read()
 
+    z.WriteLog("thermostatControlValue: " + str(thermostatControlValue))
+    z.WriteLog("room1PresenceValue: " + str(room1PresenceValue))
+    z.WriteLog("room2PresenceValue: " + str(room2PresenceValue))
     thermostatControlValue = ThermostatControlValues(thermostatControlValue) if thermostatControlValue is not None else None
     room1PresenceValue = PresenceValues(room1PresenceValue) if room1PresenceValue is not None else None
     room2PresenceValue = PresenceValues(room2PresenceValue) if room2PresenceValue is not None else None
