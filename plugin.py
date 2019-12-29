@@ -328,7 +328,6 @@ class PluginDevices:
                     radType, tempIdx, setPointIdx, radiatorExpectedTemps, radiatorComfortExtras))
         self.switches = dict([(du, VirtualSwitch(du)) for du in DeviceUnits])
         self.thermostatControlSwitch = self.switches[DeviceUnits.ThermostatControl]
-        self.thermostatModeSwitch = self.switches[DeviceUnits.ThermostatMode]
         self.room1PresenceSwitch = self.switches[DeviceUnits.Room1Presence]
         self.room2PresenceSwitch = self.switches[DeviceUnits.Room2Presence]
 
