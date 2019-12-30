@@ -434,7 +434,7 @@ def onStart():
 
     z = DomoticzPluginHelper(
         Domoticz, Settings, Parameters, Devices, Images, {})
-    z.onStart()
+    z.onStart(3)
 
     LightSwitch_Switch_Selector = DomoticzDeviceTypes.LightSwitch_Switch_Selector()
 
