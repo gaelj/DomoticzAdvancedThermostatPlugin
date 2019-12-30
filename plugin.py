@@ -396,20 +396,25 @@ def Regulate():
     # radiator: Radiator
     thermostatControlValue = pluginDevices.thermostatControlSwitch.Read()
     z.WriteLog("ThermostatControlValue: " + str(thermostatControlValue))
-    thermostatControlValue = ThermostatControlValues(
-        int(thermostatControlValue))
+    thermostatControlValue = ThermostatControlValues(int(thermostatControlValue))
+
     if thermostatControlValue == ThermostatControlValues.Off:
         pluginDevices.boiler.SetValue(False)
     else:
+        invalidRads = [r for r in pluginDevices.radiators if r.measuredTemperature is None or r.setPointTemperature is None]
         underTempRads = [
             r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.setPointTemperature is not None and int(r.measuredTemperature) < (int(r.setPointTemperature) - 1)]
         overTempRads = [r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.setPointTemperature is not None and int(r.measuredTemperature) >= int(
             r.setPointTemperature)]
+        for rad in invalidRads:
+            z.WriteLog("Invalid radiator: " + rad.radiatorType.name)
         for rad in underTempRads:
             z.WriteLog("Under-temp radiator: " + rad.radiatorType.name)
         for rad in overTempRads:
             z.WriteLog("Over-temp radiator: " + rad.radiatorType.name)
-        if not boilerCommand and len(underTempRads) > 0:
+        if boilerCommand and len(invalidRads) == len(pluginDevices.radiators):
+            pluginDevices.boiler.SetValue(False)
+        elif not boilerCommand and len(underTempRads) > 0:
             pluginDevices.boiler.SetValue(True)
         elif boilerCommand and len(overTempRads) > 0 and len(underTempRads) == 0:
             pluginDevices.boiler.SetValue(False)
