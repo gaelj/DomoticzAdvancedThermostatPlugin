@@ -284,13 +284,13 @@ class RelayActuator:
     def SetValue(self, state: bool):
         global z
         global pluginDevices
-        if self.Read() != state:
+        if self.state != state:
             command = "On" if state else "Off"
             self.state = state
             z.DomoticzAPI(
                 "type=command&param=switchlight&idx={}&switchcmd={}".format(self.idx, command))
 
-    def Read(self):
+    def Read(self) -> bool:
         global z
         global pluginDevices
         devicesAPI = z.DomoticzAPI(
@@ -388,7 +388,7 @@ def Regulate():
 
     now = datetime.now()
     pluginDevices.ReadTemperatures()
-    boilerCommand = pluginDevices.boiler.state
+    boilerCommand = pluginDevices.boiler.Read()
 
     if boilerCommand is None:
         boilerCommand = False
@@ -414,9 +414,11 @@ def Regulate():
             z.WriteLog("Over-temp radiator: " + rad.radiatorType.name)
         if boilerCommand and len(invalidRads) == len(pluginDevices.radiators):
             pluginDevices.boiler.SetValue(False)
-        elif not boilerCommand and len(underTempRads) > 0:
+        elif len(underTempRads) > 0:
+            z.WriteLog("Boiler ON")
             pluginDevices.boiler.SetValue(True)
-        elif boilerCommand and len(overTempRads) > 0 and len(underTempRads) == 0:
+        elif len(underTempRads) == 0:
+            z.WriteLog("Boiler OFF")
             pluginDevices.boiler.SetValue(False)
 
 
