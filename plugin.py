@@ -82,7 +82,7 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
                 <option label="Debug - All" value="-1"/>
             </options>
         </param>
-        <param field="Mode4" label="Enable R/W" required="true">
+        <param field="Mode4" label="Enable RW" required="true">
             <options>
                 <option label="Disabled" value="0" />
                 <option label="Enabled" value="10" default="true" />
@@ -496,7 +496,7 @@ def onStart():
                  defaultNValue=0,
                  defaultSValue="0")
 
-    z.InitDevice('Enabled', DeviceUnits.Enabled,
+    z.InitDevice('Enable RW', DeviceUnits.Enabled,
                  DeviceType=LightSwitch_Switch_Selector,
                  Used=True,
                  Options={"LevelActions": "|",
