@@ -82,10 +82,10 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
                 <option label="Debug - All" value="-1"/>
             </options>
         </param>
-        <param field="Mode4" label="Disable" required="true">
+        <param field="Mode4" label="Enable R/W" required="true">
             <options>
-                <option label="Disabled" value="1" />
-                <option label="Enabled" value="0" default="true" />
+                <option label="Disabled" value="0" />
+                <option label="Enabled" value="10" default="true" />
             </options>
         </param>
     </params>
@@ -179,7 +179,7 @@ class DeviceUnits(IntEnum):
     ThermostatControl = 1
     Room1Presence = 2
     Room2Presence = 3
-    Disabled = 4
+    Enabled = 4
 
 
 class Rooms(IntEnum):
@@ -202,10 +202,9 @@ class PresenceValues(IntEnum):
     Absent = 0
     Present = 10
 
-class DisabledValues(IntEnum):
-    Disabled = 1
-    Enabled = 0
-
+class EnabledValues(IntEnum):
+    Disabled = 0
+    Enabled = 10
 
 class VirtualSwitch:
     """Virtual switch, On/Off or multi-position"""
@@ -342,7 +341,7 @@ class PluginDevices:
         self.thermostatControlSwitch = self.switches[DeviceUnits.ThermostatControl]
         self.room1PresenceSwitch = self.switches[DeviceUnits.Room1Presence]
         self.room2PresenceSwitch = self.switches[DeviceUnits.Room2Presence]
-        self.disabledSwitch = self.switches[DeviceUnits.Disabled]
+        self.disabledSwitch = self.switches[DeviceUnits.Enabled]
 
     def ReadTemperatures(self):
         global z
@@ -355,11 +354,11 @@ def ApplySetPoints():
     global z
     global pluginDevices
 
-    disabledValue = pluginDevices.disabledSwitch.Read()
-    z.WriteLog("disabledValue: " + str(disabledValue))
-    disabledValue = int(disabledValue) if disabledValue is not None else None
+    enabledValue = pluginDevices.disabledSwitch.Read()
+    z.WriteLog("enabledValue: " + str(enabledValue))
+    enabledValue = int(enabledValue) if enabledValue is not None else None
 
-    if disabledValue == 1:
+    if enabledValue == 0:
         return
 
     thermostatControlValue = pluginDevices.thermostatControlSwitch.Read()
@@ -401,11 +400,11 @@ def Regulate():
     global z
     global pluginDevices
 
-    disabledValue = pluginDevices.disabledSwitch.Read()
-    z.WriteLog("disabledValue: " + str(disabledValue))
-    disabledValue = int(disabledValue) if disabledValue is not None else None
+    enabledValue = pluginDevices.disabledSwitch.Read()
+    z.WriteLog("enabledValue: " + str(enabledValue))
+    enabledValue = int(enabledValue) if enabledValue is not None else None
 
-    if disabledValue == 1:
+    if enabledValue == 0:
         return
 
     now = datetime.now()
@@ -497,11 +496,11 @@ def onStart():
                  defaultNValue=0,
                  defaultSValue="0")
 
-    z.InitDevice('Disabled', DeviceUnits.Disabled,
+    z.InitDevice('Enabled', DeviceUnits.Enabled,
                  DeviceType=LightSwitch_Switch_Selector,
                  Used=True,
                  Options={"LevelActions": "|",
-                          "LevelNames": "Disabled|Enabled",
+                          "LevelNames": "Disabled|RW Active",
                           "LevelOffHidden": "false",
                           "SelectorStyle": "0"},
                  defaultNValue=0,
