@@ -65,7 +65,7 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
         <param field="Password" label="Password"                                                     width="200px" required="false" default=""          />
         <param field="Mode1" label="Apply minimum heating per cycle" width="200px">
             <options>
-				<option label="ony when heating required" value="Normal"  default="true" />
+                <option label="ony when heating required" value="Normal"  default="true" />
                 <option label="always" value="Forced"/>
             </options>
         </param>
@@ -80,6 +80,12 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
                 <option label="Debug - Connections Only" value="16"/>
                 <option label="Debug - Connections+Queue" value="144"/>
                 <option label="Debug - All" value="-1"/>
+            </options>
+        </param>
+        <param field="Mode4" label="Disable" required="true">
+            <options>
+                <option label="Disabled" value="1" />
+                <option label="Enabled" value="0" default="true" />
             </options>
         </param>
     </params>
@@ -173,6 +179,7 @@ class DeviceUnits(IntEnum):
     ThermostatControl = 1
     Room1Presence = 2
     Room2Presence = 3
+    Disabled = 4
 
 
 class Rooms(IntEnum):
@@ -194,6 +201,10 @@ class ThermostatControlValues(IntEnum):
 class PresenceValues(IntEnum):
     Absent = 0
     Present = 10
+
+class DisabledValues(IntEnum):
+    Disabled = 1
+    Enabled = 0
 
 
 class VirtualSwitch:
@@ -244,16 +255,14 @@ class Radiator:
         global pluginDevices
         if self.setPointTemperature != setPoint:
             self.setPointTemperature = setPoint
-            z.DomoticzAPI("type=setused&idx={}&setpoint={}&used=true".format(
-                self.idxSetPoint, setPoint))
+            z.DomoticzAPI(f"type=setused&idx={self.idxSetPoint}&setpoint={setPoint}&used=true")
 
     @classmethod
     def ReadAll(cls):
         global z
         global pluginDevices
         radiators = pluginDevices.radiators
-        devicesAPI = z.DomoticzAPI(
-            "type=devices&filter=temp&used=true&order=Name")
+        devicesAPI = z.DomoticzAPI("type=devices&filter=temp&used=true&order=Name")
         if devicesAPI:
             for device in devicesAPI["result"]:
                 idx = int(device["idx"])
@@ -287,14 +296,12 @@ class RelayActuator:
         if self.state != state:
             command = "On" if state else "Off"
             self.state = state
-            z.DomoticzAPI(
-                "type=command&param=switchlight&idx={}&switchcmd={}".format(self.idx, command))
+            z.DomoticzAPI(f"type=command&param=switchlight&idx={self.idx}&switchcmd={command}")
 
     def Read(self) -> bool:
         global z
         global pluginDevices
-        devicesAPI = z.DomoticzAPI(
-            "type=devices&filter=light&used=true&order=Name")
+        devicesAPI = z.DomoticzAPI("type=devices&filter=light&used=true&order=Name")
         if devicesAPI:
             for device in devicesAPI["result"]:
                 idx = int(device["idx"])
@@ -335,6 +342,7 @@ class PluginDevices:
         self.thermostatControlSwitch = self.switches[DeviceUnits.ThermostatControl]
         self.room1PresenceSwitch = self.switches[DeviceUnits.Room1Presence]
         self.room2PresenceSwitch = self.switches[DeviceUnits.Room2Presence]
+        self.disabledSwitch = self.switches[DeviceUnits.Disabled]
 
     def ReadTemperatures(self):
         global z
@@ -346,6 +354,13 @@ class PluginDevices:
 def ApplySetPoints():
     global z
     global pluginDevices
+
+    disabledValue = pluginDevices.disabledSwitch.Read()
+    z.WriteLog("disabledValue: " + str(disabledValue))
+    disabledValue = int(disabledValue) if disabledValue is not None else None
+
+    if disabledValue == 1:
+        return
 
     thermostatControlValue = pluginDevices.thermostatControlSwitch.Read()
     room1PresenceValue = pluginDevices.room1PresenceSwitch.Read()
@@ -385,6 +400,13 @@ def ApplySetPoints():
 def Regulate():
     global z
     global pluginDevices
+
+    disabledValue = pluginDevices.disabledSwitch.Read()
+    z.WriteLog("disabledValue: " + str(disabledValue))
+    disabledValue = int(disabledValue) if disabledValue is not None else None
+
+    if disabledValue == 1:
+        return
 
     now = datetime.now()
     pluginDevices.ReadTemperatures()
@@ -470,6 +492,16 @@ def onStart():
                  Used=True,
                  Options={"LevelActions": "|",
                           "LevelNames": "Absent|Present",
+                          "LevelOffHidden": "false",
+                          "SelectorStyle": "0"},
+                 defaultNValue=0,
+                 defaultSValue="0")
+
+    z.InitDevice('Disabled', DeviceUnits.Disabled,
+                 DeviceType=LightSwitch_Switch_Selector,
+                 Used=True,
+                 Options={"LevelActions": "|",
+                          "LevelNames": "Disabled|Enabled",
                           "LevelOffHidden": "false",
                           "SelectorStyle": "0"},
                  defaultNValue=0,
