@@ -107,3 +107,9 @@ DomoticzPluginHelper.py
 DomoticzWrapperClass.py
 /DomoticzPluginHelper.py
 /DomoticzWrapperClass.py
+.idea/.gitignore
+.idea/DomoticzAdvancedThermostatPlugin.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/inspectionProfiles/profiles_settings.xml
