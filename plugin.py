@@ -20,7 +20,7 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
     key="GaelJDomoticzAdvancedThermostat"
     name="GDAT"
     author="gaelj"
-    version="1.0.0"
+    version="1.0.1"
     wikilink="https://github.com/gaelj/DomoticzAdvancedThermostatPlugin/blob/master/README.md"
     externallink="https://github.com/gaelj/DomoticzAdvancedThermostatPlugin">
 
