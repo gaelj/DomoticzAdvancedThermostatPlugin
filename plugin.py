@@ -450,12 +450,12 @@ def Regulate():
             #pluginDevices.boiler.SetValue(False)
 
         # max 15 minutes ON
-        if pluginDevices.boiler.state and (pluginDevices.boiler.last_state_changed - datetime.now()) >= timedelta(minutes=15):
+        if pluginDevices.boiler.state and (datetime.now() - pluginDevices.boiler.last_state_changed) >= timedelta(minutes=15):
             boiler_new_cmd = False
             z.WriteLog("MAX 15 MN ON")
 
         # min 15 minutes OFF
-        elif pluginDevices.boiler.state == False and (pluginDevices.boiler.last_state_changed - datetime.now()) < timedelta(minutes=15):
+        elif pluginDevices.boiler.state == False and (datetime.now() - pluginDevices.boiler.last_state_changed) < timedelta(minutes=15):
             boiler_new_cmd = False
             z.WriteLog("MIN 15 MN OFF")
 
