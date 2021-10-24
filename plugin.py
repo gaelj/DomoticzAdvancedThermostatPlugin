@@ -133,7 +133,7 @@ class PluginConfig:
         self.RadiatorSetpointsIdxs = {
             Rooms.Bedroom: [32],
             Rooms.Landing: [17],
-            Rooms.LivingRoom: [34, 36, 53],
+            Rooms.LivingRoom: [53, 36, 34, ],
             Rooms.Desk: [5],
         }
         self.RoomIndexes = {
