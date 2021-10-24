@@ -354,6 +354,9 @@ def ApplySetPoints():
     global z
     global pluginDevices
 
+    return
+
+    """
     enabledValue = pluginDevices.disabledSwitch.Read()
     z.WriteLog("enabledValue: " + str(enabledValue))
     enabledValue = int(enabledValue) if enabledValue is not None else None
@@ -394,6 +397,7 @@ def ApplySetPoints():
             radiator.SetValue(setPoint)
     else:
         z.WriteLog("thermostatControlValue is None")
+    """
 
 
 def Regulate():
