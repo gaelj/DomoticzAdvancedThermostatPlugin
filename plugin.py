@@ -430,34 +430,40 @@ def Regulate():
         invalidRads = [r for r in pluginDevices.radiators if r.measuredTemperature is None or r.setPointTemperature is None]
         underTempRads = [
             r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.setPointTemperature is not None and int(r.measuredTemperature) < (int(r.setPointTemperature) - 1)]
-        overTempRads = [r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.setPointTemperature is not None and int(r.measuredTemperature) >= int(
-            r.setPointTemperature)]
-        for rad in invalidRads:
-            z.WriteLog("Invalid radiator: " + rad.radiatorType.name)
-        for rad in underTempRads:
-            z.WriteLog("Under-temp radiator: " + rad.radiatorType.name)
-        for rad in overTempRads:
-            z.WriteLog("Over-temp radiator: " + rad.radiatorType.name)
+        overTempRads = [r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.setPointTemperature is not None and int(r.measuredTemperature) >= int(r.setPointTemperature)]
+        for r in invalidRads:
+            z.WriteLog(f"Invalid radiator: {r.radiatorType.name} - meas: {r.measuredTemperature}  - setpoint: {r.setPointTemperature}")
+        for r in underTempRads:
+            z.WriteLog(f"Under-temp radiator: {r.radiatorType.name} - meas: {r.measuredTemperature} - setpoint: {r.setPointTemperature}")
+        for r in overTempRads:
+            z.WriteLog(f"Over-temp radiator: {r.radiatorType.name} - meas: {r.measuredTemperature} - setpoint: {r.setPointTemperature}")
 
         boiler_new_cmd = False
         if boilerCommand and len(invalidRads) == len(pluginDevices.radiators):
-            z.WriteLog("Boiler OFF")
-            #pluginDevices.boiler.SetValue(False)
+            boiler_new_cmd = False
+            z.WriteLog("ALL INVALID")
         elif len(underTempRads) > 0:
-            z.WriteLog("Boiler ON")
+            #z.WriteLog("Boiler ON")
             #pluginDevices.boiler.SetValue(True)
             boiler_new_cmd = True
+            z.WriteLog("UNDER TEMP")
         elif len(underTempRads) == 0:
-            z.WriteLog("Boiler OFF")
+            #z.WriteLog("Boiler OFF")
+            boiler_new_cmd = False
+            z.WriteLog("NO UNDER TEMP")
             #pluginDevices.boiler.SetValue(False)
 
         # max 15 minutes ON
         if pluginDevices.boiler.state and (pluginDevices.boiler.last_state_changed - datetime.now()) >= timedelta(minutes=15):
             boiler_new_cmd = False
+            z.WriteLog("MAX 15 MN ON")
 
         # min 15 minutes OFF
         elif pluginDevices.boiler.state == False and (pluginDevices.boiler.last_state_changed - datetime.now()) < timedelta(minutes=15):
             boiler_new_cmd = False
+            z.WriteLog("MIN 15 MN OFF")
+
+        z.WriteLog("Boiler " + ("ON" if boiler_new_cmd else "OFF"))
 
         pluginDevices.boiler.SetValue(boiler_new_cmd)
 
