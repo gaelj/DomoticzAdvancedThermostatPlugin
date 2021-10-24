@@ -98,7 +98,7 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
 
 
 import Domoticz
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 import time
 from enum import IntEnum
 z = None
@@ -288,6 +288,7 @@ class RelayActuator:
         global pluginDevices
         self.idx = idx
         self.state = None
+        self.last_state_changed = None
 
     def SetValue(self, state: bool):
         global z
@@ -296,6 +297,7 @@ class RelayActuator:
             command = "On" if state else "Off"
             self.state = state
             z.DomoticzAPI(f"type=command&param=switchlight&idx={self.idx}&switchcmd={command}")
+            self.last_state_changed = datetime.now()
 
     def Read(self) -> bool:
         global z
@@ -411,7 +413,6 @@ def Regulate():
     if enabledValue == 0:
         return
 
-    now = datetime.now()
     pluginDevices.ReadTemperatures()
     boilerCommand = pluginDevices.boiler.Read()
 
@@ -437,14 +438,28 @@ def Regulate():
             z.WriteLog("Under-temp radiator: " + rad.radiatorType.name)
         for rad in overTempRads:
             z.WriteLog("Over-temp radiator: " + rad.radiatorType.name)
+
+        boiler_new_cmd = False
         if boilerCommand and len(invalidRads) == len(pluginDevices.radiators):
-            pluginDevices.boiler.SetValue(False)
+            z.WriteLog("Boiler OFF")
+            #pluginDevices.boiler.SetValue(False)
         elif len(underTempRads) > 0:
             z.WriteLog("Boiler ON")
-            pluginDevices.boiler.SetValue(True)
+            #pluginDevices.boiler.SetValue(True)
+            boiler_new_cmd = True
         elif len(underTempRads) == 0:
             z.WriteLog("Boiler OFF")
-            pluginDevices.boiler.SetValue(False)
+            #pluginDevices.boiler.SetValue(False)
+
+        # max 15 minutes ON
+        if pluginDevices.boiler.state and (pluginDevices.boiler.last_state_changed - datetime.now()) >= timedelta(minutes=15):
+            boiler_new_cmd = False
+
+        # min 15 minutes OFF
+        elif pluginDevices.boiler.state == False and (pluginDevices.boiler.last_state_changed - datetime.now()) < timedelta(minutes=15):
+            boiler_new_cmd = False
+
+        pluginDevices.boiler.SetValue(boiler_new_cmd)
 
 
 def onStart():
