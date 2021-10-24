@@ -165,12 +165,12 @@ class PluginConfig:
                 Rooms.Bedroom: [16],
                 Rooms.Landing: [18],
                 Rooms.LivingRoom: [19, 17, 19],
-                Rooms.Desk: [21], },
+                Rooms.Desk: [19], },
             ThermostatControlValues.Comfort: {
                 Rooms.Bedroom: [16],
                 Rooms.Landing: [18],
                 Rooms.LivingRoom: [20, 17, 20],
-                Rooms.Desk: [22], },
+                Rooms.Desk: [19], },
         }
 
 
