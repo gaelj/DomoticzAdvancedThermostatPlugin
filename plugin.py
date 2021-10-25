@@ -174,8 +174,8 @@ class PluginConfig:
                 Rooms.Desk: [19], },
             ThermostatControlValues.Comfort: {
                 Rooms.Bedroom: [16],
-                Rooms.Landing: [18],
-                Rooms.LivingRoom: [20, 17, 20],
+                Rooms.Landing: [19],
+                Rooms.LivingRoom: [20, 19, 20],
                 Rooms.Desk: [19], },
         }
 
@@ -434,7 +434,7 @@ def Regulate():
     else:
         invalidRads = [r for r in pluginDevices.radiators if r.measuredTemperature is None or r.setPointTemperature is None]
         underTempRads = [
-            r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.setPointTemperature is not None and int(r.measuredTemperature) < (int(r.setPointTemperature) - 1)]
+            r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.setPointTemperature is not None and int(r.measuredTemperature) < (int(r.setPointTemperature) - 0.5)]
         overTempRads = [r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.setPointTemperature is not None and int(r.measuredTemperature) >= int(r.setPointTemperature)]
         for r in invalidRads:
             z.WriteLog(f"Invalid radiator: {r.radiatorName} - meas: {r.measuredTemperature}  - setpoint: {r.setPointTemperature}")
