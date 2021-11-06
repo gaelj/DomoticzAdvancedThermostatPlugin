@@ -264,7 +264,7 @@ class Radiator:
             z.DomoticzAPI(f"type=setused&idx={self.idxSetPoint}&setpoint={setPoint}&used=true")
 
     @classmethod
-    def ReadAll(cls):
+    def ReadAllTemperatures(cls):
         global z
         global pluginDevices
         radiators = pluginDevices.radiators
@@ -325,7 +325,7 @@ class OutsideWeather:
         self.idx = idx
         self.temperature = None
 
-    def Read(self):
+    def ReadOutsideTemperature(self):
         return self.temperature
 
 
@@ -357,8 +357,8 @@ class PluginDevices:
     def ReadTemperatures(self):
         global z
         global pluginDevices
-        Radiator.ReadAll()
-        self.exterior.Read()
+        Radiator.ReadAllTemperatures()
+        self.exterior.ReadOutsideTemperature()
 
 
 def ApplySetPoints():
