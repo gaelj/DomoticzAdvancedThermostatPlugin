@@ -180,6 +180,9 @@ class PluginConfig:
                 Rooms.BabyBedroom:[19], },
         }
 
+        self.MaxOnTime = 10
+        self.MinOffTime = 5
+
 
 class DeviceUnits(IntEnum):
     """Unit numbers of each virtual switch"""
@@ -449,7 +452,7 @@ def Regulate():
 
     # radiator: Radiator
     thermostatControlValue = pluginDevices.thermostatControlSwitch.Read()
-    z.WriteLog("ThermostatControlValue: " + str(thermostatControlValue))
+    # z.WriteLog("ThermostatControlValue: " + str(thermostatControlValue))
     thermostatControlValue = ThermostatControlValues(int(thermostatControlValue))
 
     if thermostatControlValue == ThermostatControlValues.Off:
@@ -481,15 +484,15 @@ def Regulate():
             z.WriteLog("NO UNDER TEMP")
             #pluginDevices.boiler.SetValue(False)
 
-        # max 15 minutes ON
-        if pluginDevices.boiler.state and (datetime.now() - pluginDevices.boiler.last_state_changed) >= timedelta(minutes=15) and boiler_new_cmd:
+        # max time ON
+        if pluginDevices.boiler.state and (datetime.now() - pluginDevices.boiler.last_state_changed) >= timedelta(minutes=pluginDevices.config.MaxOnTime) and boiler_new_cmd:
             boiler_new_cmd = False
-            z.WriteLog("MAX 15 MN ON")
+            z.WriteLog(f"MAX TIME ON: {pluginDevices.config.MaxOnTime} mn")
 
-        # min 15 minutes OFF
-        elif pluginDevices.boiler.state == False and (datetime.now() - pluginDevices.boiler.last_state_changed) < timedelta(minutes=15) and boiler_new_cmd:
+        # min time OFF
+        elif pluginDevices.boiler.state == False and (datetime.now() - pluginDevices.boiler.last_state_changed) < timedelta(minutes=pluginDevices.config.MinOffTime) and boiler_new_cmd:
             boiler_new_cmd = False
-            z.WriteLog("MIN 15 MN OFF")
+            z.WriteLog("MIN TIME OFF: {pluginDevices.config.MinOffTime} mn")
 
         z.WriteLog("Boiler " + ("ON" if boiler_new_cmd else "OFF"))
 
