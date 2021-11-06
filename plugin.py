@@ -433,8 +433,10 @@ def Regulate():
     global z
     global pluginDevices
 
+    z.WriteLog("########### START LOOP ###########")
+
     enabledValue = pluginDevices.disabledSwitch.Read()
-    z.WriteLog("enabledValue: " + str(enabledValue))
+    # z.WriteLog("enabledValue: " + str(enabledValue))
     enabledValue = int(enabledValue) if enabledValue is not None else None
 
     if enabledValue == 0:
