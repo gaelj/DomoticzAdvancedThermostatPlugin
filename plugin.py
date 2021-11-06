@@ -97,6 +97,7 @@ For more details, see [Using Python Plugins](https://www.domoticz.com/wiki/Using
 # <param field="Mode3"    label="Heating switch + Inside Radiator Setpoints, grouped by room (idx1, idx2...)"   width="300px" required="true"  default=""          />
 
 
+from typing import List
 import Domoticz
 from datetime import date, datetime, timedelta
 import time
@@ -151,7 +152,7 @@ class PluginConfig:
         self.ExteriorTempSensorsIdx = 116
         self.BoilerRelayIdx = 50
 
-        self.ExpectedTemps = {
+        self.ExpectedTempsByControlValues = {
             ThermostatControlValues.Off: {
                 Rooms.Bedroom:    [13],
                 Rooms.Landing:    [15],
@@ -286,6 +287,28 @@ class Radiator:
                         Domoticz.Error(
                             "device: {}-{} is not a Temperature sensor".format(device["idx"], device["Name"]))
 
+    @classmethod
+    def ReadAllSetpoints(cls):
+        global z
+        global pluginDevices
+        radiators = pluginDevices.radiators
+        devicesAPI = z.DomoticzAPI("type=devices&filter=utility&used=true&order=Name")
+        if devicesAPI:
+            for device in devicesAPI["result"]:
+                idx = int(device["idx"])
+                if idx in [r.idxSetPoint for r in radiators]:
+                    radiator = [r for r in radiators if r.idxSetPoint == idx][0]
+                    if "SetPoint" in device:
+                        Domoticz.Debug(
+                            "device: {}-{} = {}".format(device["idx"], device["Name"], device["SetPoint"]))
+                        # check thermostat is not timed out
+                        if not z.SensorTimedOut(idx, device["Name"], device["LastUpdate"]):
+                            radiator.setPointTemperature = device["SetPoint"]
+                            z.WriteLog(
+                                "Radiator setpoint " + device["Name"] + ": " + str(device["SetPoint"]))
+                    else:
+                        Domoticz.Error(
+                            "device: {}-{} is not a thermostat".format(device["idx"], device["Name"]))
 
 class RelayActuator:
     """On/Off relay actuator"""
@@ -334,8 +357,8 @@ class PluginDevices:
         self.config = PluginConfig()
         self.exterior = OutsideWeather(self.config.ExteriorTempSensorsIdx)
         self.boiler = RelayActuator(self.config.BoilerRelayIdx)
-        self.radiators = []
-        expectedTemps = self.config.ExpectedTemps
+        self.radiators: List[Radiator] = []
+        expectedTempsByControlValues = self.config.ExpectedTempsByControlValues
         for radType in self.config.InsideTempSensorIdxs:
             tempIdxs = self.config.InsideTempSensorIdxs[radType]
             rad_names = self.config.RadiatorNames[radType]
@@ -344,21 +367,23 @@ class PluginDevices:
                 setPointIdx = setPointIdxs[i]
                 radiatorExpectedTemps = {}
                 rad_name = rad_names[i]
-                for controlValue in expectedTemps:
-                    radiatorExpectedTemps[controlValue] = expectedTemps[controlValue][radType][i]
-                self.radiators.append(Radiator(
-                    radType, rad_name, tempIdx, setPointIdx, radiatorExpectedTemps))
+                for controlValue in expectedTempsByControlValues:
+                    radiatorExpectedTemps[controlValue] = expectedTempsByControlValues[controlValue][radType][i]
+                self.radiators.append(
+                    Radiator(radType, rad_name, tempIdx, setPointIdx, radiatorExpectedTemps)
+                )
         self.switches = dict([(du, VirtualSwitch(du)) for du in DeviceUnits])
         self.thermostatControlSwitch = self.switches[DeviceUnits.ThermostatControl]
         self.room1PresenceSwitch = self.switches[DeviceUnits.Room1Presence]
         self.room2PresenceSwitch = self.switches[DeviceUnits.Room2Presence]
         self.disabledSwitch = self.switches[DeviceUnits.Enabled]
 
-    def ReadTemperatures(self):
+    def ReadAllSensors(self):
         global z
         global pluginDevices
         Radiator.ReadAllTemperatures()
         self.exterior.ReadOutsideTemperature()
+        Radiator.ReadAllSetpoints()
 
 
 def ApplySetPoints():
@@ -415,7 +440,7 @@ def Regulate():
     if enabledValue == 0:
         return
 
-    pluginDevices.ReadTemperatures()
+    pluginDevices.ReadAllSensors()
     boilerCommand = pluginDevices.boiler.Read()
 
     if boilerCommand is None:
