@@ -284,8 +284,7 @@ class Radiator:
                         # check temp sensor is not timed out
                         if not z.SensorTimedOut(idx, device["Name"], device["LastUpdate"]):
                             radiator.measuredTemperature = float(device["Temp"])
-                            z.WriteLog(
-                                "Radiator temp " + device["Name"] + ": " + str(device["Temp"]))
+                            # z.WriteLog("Radiator temp " + device["Name"] + ": " + str(device["Temp"]))
                     else:
                         Domoticz.Error(
                             "device: {}-{} is not a Temperature sensor".format(device["idx"], device["Name"]))
@@ -307,8 +306,7 @@ class Radiator:
                         # check thermostat is not timed out
                         if not z.SensorTimedOut(idx, device["Name"], device["LastUpdate"]):
                             radiator.setPointTemperature = float(device["SetPoint"])
-                            z.WriteLog(
-                                "Radiator setpoint " + device["Name"] + ": " + str(device["SetPoint"]))
+                            # z.WriteLog("Radiator setpoint " + device["Name"] + ": " + str(device["SetPoint"]))
                     else:
                         Domoticz.Error(
                             "device: {}-{} is not a thermostat".format(device["idx"], device["Name"]))
