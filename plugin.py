@@ -253,8 +253,8 @@ class Radiator:
         self.radiatorName = rad_name
         self.idxTemp = idxTemp
         self.idxSetPoint = idxSetPoint
-        self.measuredTemperature = None
-        self.setPointTemperature = None
+        self.measuredTemperature: float = None
+        self.setPointTemperature: float = None
         self.expectedTemps = expectedTemps
 
     def SetValue(self, setPoint):
@@ -280,7 +280,7 @@ class Radiator:
                             "device: {}-{} = {}".format(device["idx"], device["Name"], device["Temp"]))
                         # check temp sensor is not timed out
                         if not z.SensorTimedOut(idx, device["Name"], device["LastUpdate"]):
-                            radiator.measuredTemperature = device["Temp"]
+                            radiator.measuredTemperature = float(device["Temp"])
                             z.WriteLog(
                                 "Radiator temp " + device["Name"] + ": " + str(device["Temp"]))
                     else:
@@ -303,7 +303,7 @@ class Radiator:
                             "device: {}-{} = {}".format(device["idx"], device["Name"], device["SetPoint"]))
                         # check thermostat is not timed out
                         if not z.SensorTimedOut(idx, device["Name"], device["LastUpdate"]):
-                            radiator.setPointTemperature = device["SetPoint"]
+                            radiator.setPointTemperature = float(device["SetPoint"])
                             z.WriteLog(
                                 "Radiator setpoint " + device["Name"] + ": " + str(device["SetPoint"]))
                     else:
