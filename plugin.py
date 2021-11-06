@@ -294,7 +294,7 @@ class RelayActuator:
         global z
         global pluginDevices
         self.idx = idx
-        self.state = None
+        self.state = self.Read()
         self.last_state_changed = datetime.now() - timedelta(minutes=16)
 
     def SetValue(self, state: bool):
