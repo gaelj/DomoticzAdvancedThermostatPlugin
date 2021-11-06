@@ -125,58 +125,58 @@ class PluginConfig:
 
     def __init__(self):
         self.RadiatorNames = {
-            Rooms.Bedroom: ["Chambre"],         # chambre
-            Rooms.Landing: ["Palier"],         # palier
-            Rooms.LivingRoom: ["Canapé", "Rue"],  # Canapé, rue, (TV)
-            Rooms.Desk: ["Bureau"],             # Bureau
+            Rooms.Bedroom: ["Chambre Parents"],     # chambre
+            Rooms.Landing: ["Palier"],              # palier
+            Rooms.LivingRoom: ["Canapé", "Rue"],    # Canapé, rue, (TV)
+            Rooms.BabyBedroom: ["Chambre Kays"],    # Bureau
         }
         self.InsideTempSensorIdxs = {
             Rooms.Bedroom: [45],         # chambre
             Rooms.Landing: [18],         # palier
             Rooms.LivingRoom: [73, 37],  # Canapé, rue, (TV)
-            Rooms.Desk: [6],             # Bureau
+            Rooms.BabyBedroom: [6],      # Bureau
         }
         self.RadiatorSetpointsIdxs = {
             Rooms.Bedroom: [32],
             Rooms.Landing: [17],
-            Rooms.LivingRoom: [53, 36, 34, ],
-            Rooms.Desk: [5],
+            Rooms.LivingRoom: [53, 36],
+            Rooms.BabyBedroom: [5],
         }
         self.RoomIndexes = {
             Rooms.Bedroom: 0,         # chambre
             Rooms.Landing: 2,         # palier
-            Rooms.LivingRoom: 1,  # Canapé, rue, (TV)
-            Rooms.Desk: 2,
+            Rooms.LivingRoom: 1,      # Canapé, rue, (TV)
+            Rooms.BabyBedroom: 2,
         }
         self.ExteriorTempSensorsIdx = 116
         self.BoilerRelayIdx = 50
 
         self.ExpectedTemps = {
             ThermostatControlValues.Off: {
-                Rooms.Bedroom: [15],
-                Rooms.Landing: [17],
+                Rooms.Bedroom:    [13],
+                Rooms.Landing:    [15],
                 Rooms.LivingRoom: [14, 13, 14],
-                Rooms.Desk: [15], },
+                Rooms.BabyBedroom:[13], },
             ThermostatControlValues.Away: {
-                Rooms.Bedroom: [15],
-                Rooms.Landing: [17],
+                Rooms.Bedroom:    [15],
+                Rooms.Landing:    [17],
                 Rooms.LivingRoom: [14, 13, 14],
-                Rooms.Desk: [15], },
+                Rooms.BabyBedroom:[15], },
             ThermostatControlValues.Night: {
-                Rooms.Bedroom: [16],
-                Rooms.Landing: [16],
+                Rooms.Bedroom:    [16],
+                Rooms.Landing:    [16],
                 Rooms.LivingRoom: [15, 14, 15],
-                Rooms.Desk: [16], },
+                Rooms.BabyBedroom:[16], },
             ThermostatControlValues.Normal: {
-                Rooms.Bedroom: [16],
-                Rooms.Landing: [18],
+                Rooms.Bedroom:    [16],
+                Rooms.Landing:    [18],
                 Rooms.LivingRoom: [19, 17, 19],
-                Rooms.Desk: [19], },
+                Rooms.BabyBedroom:[19], },
             ThermostatControlValues.Comfort: {
-                Rooms.Bedroom: [16],
-                Rooms.Landing: [19],
+                Rooms.Bedroom:    [16],
+                Rooms.Landing:    [19],
                 Rooms.LivingRoom: [20, 19, 20],
-                Rooms.Desk: [19], },
+                Rooms.BabyBedroom:[19], },
         }
 
 
@@ -192,7 +192,7 @@ class Rooms(IntEnum):
     """Room types, each with a different heating configuration"""
     Bedroom = 0
     LivingRoom = 1
-    Desk = 2
+    BabyBedroom = 2
     Landing = 3
 
 
@@ -380,12 +380,9 @@ def ApplySetPoints():
     z.WriteLog("room1PresenceValue: " + str(room1PresenceValue))
     z.WriteLog("room2PresenceValue: " + str(room2PresenceValue))
 
-    thermostatControlValue = ThermostatControlValues(
-        thermostatControlValue) if thermostatControlValue is not None else None
-    room1PresenceValue = PresenceValues(
-        room1PresenceValue) if room1PresenceValue is not None else None
-    room2PresenceValue = PresenceValues(
-        room2PresenceValue) if room2PresenceValue is not None else None
+    thermostatControlValue = ThermostatControlValues(thermostatControlValue) if thermostatControlValue is not None else None
+    room1PresenceValue = PresenceValues(room1PresenceValue) if room1PresenceValue is not None else None
+    room2PresenceValue = PresenceValues(room2PresenceValue) if room2PresenceValue is not None else None
 
     if thermostatControlValue is not None:
         for radiator in pluginDevices.radiators:
