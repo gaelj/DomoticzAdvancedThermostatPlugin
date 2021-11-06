@@ -128,19 +128,19 @@ class PluginConfig:
         self.RadiatorNames = {
             Rooms.Bedroom: ["Chambre Parents"],     # chambre
             Rooms.Landing: ["Palier"],              # palier
-            Rooms.LivingRoom: ["Canapé", "Rue"],    # Canapé, rue, (TV)
+            Rooms.LivingRoom: ["Canapé", "Rue", "TV"],    # Canapé, rue, (TV)
             Rooms.BabyBedroom: ["Chambre Kays"],    # Bureau
         }
         self.InsideTempSensorIdxs = {
             Rooms.Bedroom: [45],         # chambre
             Rooms.Landing: [18],         # palier
-            Rooms.LivingRoom: [73, 37],  # Canapé, rue, (TV)
+            Rooms.LivingRoom: [73, 37, 169],  # Canapé, rue, (TV)
             Rooms.BabyBedroom: [6],      # Bureau
         }
         self.RadiatorSetpointsIdxs = {
             Rooms.Bedroom: [32],
             Rooms.Landing: [17],
-            Rooms.LivingRoom: [53, 36],
+            Rooms.LivingRoom: [53, 36, 168],
             Rooms.BabyBedroom: [5],
         }
         self.RoomIndexes = {
