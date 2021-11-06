@@ -433,14 +433,13 @@ def Regulate():
     global z
     global pluginDevices
 
-    z.WriteLog("########### START LOOP ###########")
-
     enabledValue = pluginDevices.disabledSwitch.Read()
-    # z.WriteLog("enabledValue: " + str(enabledValue))
-    enabledValue = int(enabledValue) if enabledValue is not None else None
+    enabledValue = int(enabledValue) if enabledValue is not None else 0
 
     if enabledValue == 0:
         return
+
+    z.WriteLog("########### START LOOP ###########")
 
     pluginDevices.ReadAllSensors()
     boilerCommand = pluginDevices.boiler.Read()
