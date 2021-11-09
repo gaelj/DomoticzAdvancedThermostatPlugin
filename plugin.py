@@ -470,18 +470,10 @@ def Regulate():
 
         boiler_new_cmd = False
         if boilerCommand and len(invalidRads) == len(pluginDevices.radiators):
-            boiler_new_cmd = False
             z.WriteLog("ALL INVALID")
-        elif len(underTempRads) > 0:
-            #z.WriteLog("Boiler ON")
-            #pluginDevices.boiler.SetValue(True)
+        elif len(underTempRads) > 0 and len(overTempRads) == 0:
             boiler_new_cmd = True
             z.WriteLog("UNDER TEMP")
-        elif len(underTempRads) == 0:
-            #z.WriteLog("Boiler OFF")
-            boiler_new_cmd = False
-            z.WriteLog("NO UNDER TEMP")
-            #pluginDevices.boiler.SetValue(False)
 
         # max time ON
         if pluginDevices.boiler.state and (datetime.now() - pluginDevices.boiler.last_state_changed) >= timedelta(minutes=pluginDevices.config.MaxOnTime) and boiler_new_cmd:
