@@ -135,13 +135,13 @@ class PluginConfig:
             Rooms.Bedroom: [45],         # chambre
             Rooms.Landing: [18],         # palier
             Rooms.LivingRoom: [73, 37, 169],  # Canapé, rue, (TV)
-            Rooms.BabyBedroom: [6],      # Bureau
+            Rooms.BabyBedroom: [178],      # Bureau
         }
         self.RadiatorSetpointsIdxs = {
             Rooms.Bedroom: [32],
             Rooms.Landing: [17],
             Rooms.LivingRoom: [53, 36, 168],
-            Rooms.BabyBedroom: [5],
+            Rooms.BabyBedroom: [177],
         }
         self.RoomIndexes = {
             Rooms.Bedroom: 0,         # chambre
