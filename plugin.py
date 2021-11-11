@@ -471,7 +471,7 @@ def Regulate():
         boiler_new_cmd = False
         if boilerCommand and len(invalidRads) == len(pluginDevices.radiators):
             z.WriteLog("ALL INVALID")
-        elif len(underTempRads) > 0 and len(overTempRads) == 0:
+        elif len(underTempRads) >= 2 and len(overTempRads) <= 3:
             boiler_new_cmd = True
             z.WriteLog("UNDER TEMP")
 
