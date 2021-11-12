@@ -554,7 +554,7 @@ def onStart():
                  defaultSValue="0")
 
     pluginDevices = PluginDevices()
-    ApplySetPoints()
+    # ApplySetPoints()
 
 
 def onStop():
