@@ -457,9 +457,9 @@ def Regulate():
     if thermostatControlValue == ThermostatControlValues.Off:
         pluginDevices.boiler.SetValue(False)
     else:
-        invalidRads = [r for r in pluginDevices.radiators if r.measuredTemperature is None or r.setPointTemperature is None]
+        invalidRads = [r for r in pluginDevices.radiators if r.measuredTemperature is None or r.setPointTemperature is None or r.measuredTemperature == 0 or r.setPointTemperature == 0]
         underTempRads = [
-            r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.setPointTemperature is not None and int(r.measuredTemperature) < (int(r.setPointTemperature) - (pluginDevices.config.TemperatureHisteresis / 2))]
+            r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.setPointTemperature is not None and int(r.measuredTemperature) < (int(r.setPointTemperature if r.setPointTemperature < 20 else 20) - (pluginDevices.config.TemperatureHisteresis / 2))]
         overTempRads = [r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.setPointTemperature is not None and int(r.measuredTemperature) >= int(r.setPointTemperature) + pluginDevices.config.TemperatureHisteresis]
         for r in invalidRads:
             z.WriteLog(f"Invalid radiator: {r.radiatorName} - meas: {r.measuredTemperature}  - setpoint: {r.setPointTemperature}")
