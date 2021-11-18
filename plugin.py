@@ -259,11 +259,16 @@ class Radiator:
         self.idxSetPoint = idxSetPoint
         self.measuredTemperature: float = None
         self.setPointTemperature: float = None
+        self.adjustedSetPointTemperature: float = None
         self.expectedTemps = expectedTemps
+
+    def SetAdjustedSetPointTemp(self):
+        self.adjustedSetPointTemperature = self.setPointTemperature if self.setPointTemperature < 19 else 19
 
     def SetValue(self, setPoint):
         global z
         global pluginDevices
+        self.SetAdjustedSetPointTemp()
         if self.setPointTemperature != setPoint:
             self.setPointTemperature = setPoint
             z.DomoticzAPI(f"type=setused&idx={self.idxSetPoint}&setpoint={setPoint}&used=true")
@@ -307,6 +312,7 @@ class Radiator:
                         # check thermostat is not timed out
                         if not z.SensorTimedOut(idx, device["Name"], device["LastUpdate"]):
                             radiator.setPointTemperature = float(device["SetPoint"])
+                            radiator.SetAdjustedSetPointTemp()
                             # z.WriteLog("Radiator setpoint " + device["Name"] + ": " + str(device["SetPoint"]))
                     else:
                         Domoticz.Error(
@@ -459,14 +465,14 @@ def Regulate():
     else:
         invalidRads = [r for r in pluginDevices.radiators if r.measuredTemperature is None or r.setPointTemperature is None or r.measuredTemperature == 0 or r.setPointTemperature == 0]
         underTempRads = [
-            r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.setPointTemperature is not None and int(r.measuredTemperature) < (int(r.setPointTemperature if r.setPointTemperature < 20 else 20) - (pluginDevices.config.TemperatureHisteresis / 2))]
-        overTempRads = [r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.setPointTemperature is not None and int(r.measuredTemperature) >= int(r.setPointTemperature) + pluginDevices.config.TemperatureHisteresis]
+            r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.adjustedSetPointTemperature is not None and int(r.measuredTemperature) < (int(r.adjustedSetPointTemperature) - (pluginDevices.config.TemperatureHisteresis / 2))]
+        overTempRads = [r for r in pluginDevices.radiators if r.measuredTemperature is not None and r.adjustedSetPointTemperature is not None and int(r.measuredTemperature) >= int(r.adjustedSetPointTemperature) + pluginDevices.config.TemperatureHisteresis]
         for r in invalidRads:
-            z.WriteLog(f"Invalid radiator: {r.radiatorName} - meas: {r.measuredTemperature}  - setpoint: {r.setPointTemperature}")
+            z.WriteLog(f"Invalid radiator: {r.radiatorName} - meas: {r.measuredTemperature}  - setpoint: {r.adjustedSetPointTemperature}")
         for r in underTempRads:
-            z.WriteLog(f"Under-temp radiator: {r.radiatorName} - meas: {r.measuredTemperature} - setpoint: {r.setPointTemperature}")
+            z.WriteLog(f"Under-temp radiator: {r.radiatorName} - meas: {r.measuredTemperature} - setpoint: {r.adjustedSetPointTemperature}")
         for r in overTempRads:
-            z.WriteLog(f"Over-temp radiator: {r.radiatorName} - meas: {r.measuredTemperature} - setpoint: {r.setPointTemperature}")
+            z.WriteLog(f"Over-temp radiator: {r.radiatorName} - meas: {r.measuredTemperature} - setpoint: {r.adjustedSetPointTemperature}")
 
         boiler_new_cmd = False
         if boilerCommand and len(invalidRads) == len(pluginDevices.radiators):
