@@ -581,7 +581,7 @@ def onCommand(Unit, Command, Level, Color):
         value = Level
     du = DeviceUnits(Unit)
     pluginDevices.switches[du].SetValue(value)
-    ApplySetPoints()
+    # ApplySetPoints()
     Regulate()
 
 
